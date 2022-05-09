@@ -9,15 +9,12 @@ public class Scheduler {
 	private QueueObj generalBlockedQ;
 	private Interpreter interpreter;
 
-//	public Scheduler(int t, QueueObj readyQ, QueueObj generalblockedQ) {
-//		this.readyQ = readyQ;
-//		this.generalBlockedQ = generalblockedQ;
-//		this.timeSlice = t;
-//	}
 
 	public Scheduler(int timeSlice, Interpreter interpreter) {
 		this.timeSlice = timeSlice;
 		this.interpreter = interpreter;
+		this.readyQ=interpreter.getReadyQ();
+		this.generalBlockedQ=interpreter.getGeneralBlockedQ();
 	}
 
 	public int getTimeSlice() {
@@ -28,24 +25,27 @@ public class Scheduler {
 		this.timeSlice = timeSlice;
 	}
 
-	public void scheduling() throws IOException {
+	public void scheduling(int time) throws IOException {
 		while (!readyQ.isEmpty()) {
-			Process p = (Process) readyQ.dequeue();
-			p.status = Status.RUNNING;
-			System.out.println("Program" +" "+ p.processID +" "+ "is currently executing");
+			Process p =readyQ.dequeue();
+			p.setStatus(Status.RUNNING);
+			System.out.println("Program" +" "+ p.getProcessID() +" "+ "is currently executing");
 			System.out.println("ready Queue");
 			readyQ.printQueue();
 			System.out.println("Blocked Queue");
 			generalBlockedQ.printQueue();
-			interpreter.convert(p, timeSlice);
-			if (p.pc > p.instructions.size()) {
-				p.status = Status.FINISHED;
+			System.out.println("scheduler "+p.getInstructions().size());
+			interpreter.convert(p, timeSlice,time);
+			if (p.getPc() > p.getInstructions().size()) {
+				p.setStatus(Status.FINISHED);
+				interpreter.getFinishedProcessesQ().enqueue(p);
+				//interpreter.finishedProcessesQ.enqueue(p);
 				System.out.println("ready Queue");
 				readyQ.printQueue();
 				System.out.println("Blocked Queue");
 				generalBlockedQ.printQueue();
 			} else {
-				p.status = Status.READY;
+				p.setStatus(Status.READY);
 				readyQ.enqueue(p);
 			}
 		}

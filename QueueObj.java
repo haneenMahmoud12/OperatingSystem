@@ -6,7 +6,7 @@ public class QueueObj
 	private int front;
 	private int rear;
 	private int nItems;
-	private Object [] elements;
+	private Process [] elements;
 
 	public QueueObj(int maxSize) 
 	{
@@ -14,10 +14,10 @@ public class QueueObj
 		front = 0;
 		rear = -1;
 		nItems = 0;
-		elements = new Object[maxsize];
+		elements = new Process[maxsize];
 	}
 
-	public void enqueue(Object x)
+	public void enqueue(Process x)
 	{
 		if(rear == maxsize - 1)
 			rear = -1;
@@ -26,9 +26,9 @@ public class QueueObj
 		nItems++;
 	}
 
-	public Object dequeue()
+	public Process dequeue()
 	{
-		Object result = elements[front];
+		Process result = elements[front];
 		front++;
 
 		if(front == maxsize)
@@ -38,7 +38,7 @@ public class QueueObj
 		return result;
 	}
 
-	public Object peek()
+	public Process peek()
 	{
 		return elements[front];
 	}

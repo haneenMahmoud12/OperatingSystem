@@ -33,45 +33,50 @@ public class Mutex {
 //	depending on the value of the flag.
 
 	public void semWait(String Flag, Process p) {
-		p.status = Status.RUNNING;
 		if (Flag.equals("file")) {
 			if (this.file == true) {
 				this.file = false;
-				pid_file = p.processID;
+				pid_file = p.getProcessID();
 			} else {
 				this.fileBlockedQ.enqueue(p);
-				p.status = Status.BLOCKED;
+				generalBlockedQ.enqueue(p);
+				p.setStatus(Status.BLOCKED);;
 				System.out.println("ready Queue");
 				readyQ.printQueue();
 				System.out.println("Blocked Queue");
 				generalBlockedQ.printQueue();
-				generalBlockedQ.enqueue(p);
+				System.out.println("File Blocked Queue");
+				fileBlockedQ.printQueue();
 			}
 		} else if (Flag.equals("userInput")) {
 			if (this.userInput == true) {
 				this.userInput = false;
-				pid_input = p.processID;
+				pid_input = p.getProcessID();
 			} else {
 				this.userInputBlockedQ.enqueue(p);
-				p.status = Status.BLOCKED;
+				generalBlockedQ.enqueue(p);
+				p.setStatus(Status.BLOCKED);
 				System.out.println("ready Queue");
 				readyQ.printQueue();
 				System.out.println("Blocked Queue");
 				generalBlockedQ.printQueue();
-				generalBlockedQ.enqueue(p);
+				System.out.println("User Input Blocked Queue");
+				userInputBlockedQ.printQueue();
 			}
 		} else {
 			if (this.userOutput == true) {
 				this.userOutput = false;
-				pid_output = p.processID;
+				pid_output = p.getProcessID();
 			} else {
 				this.userOutputBlockedQ.enqueue(p);
-				p.status = Status.BLOCKED;
+				generalBlockedQ.enqueue(p);
+				p.setStatus(Status.BLOCKED);
 				System.out.println("ready Queue");
 				readyQ.printQueue();
 				System.out.println("Blocked Queue");
 				generalBlockedQ.printQueue();
-				generalBlockedQ.enqueue(p);
+				System.out.println("User Output Blocked Queue");
+				userOutputBlockedQ.printQueue();
 			}
 		}
 
@@ -79,38 +84,38 @@ public class Mutex {
 
 	public void semSignal(String Flag, Process p) {
 		if (Flag.equals("file")) {
-			if (p.processID == pid_file) {
+			if (p.getProcessID() == pid_file) {
 				if (fileBlockedQ.isEmpty())
 					file = true;
 				else {
 					Process p1 = (Process) fileBlockedQ.dequeue();
-					p1.status = Status.READY;
+					p1.setStatus(Status.READY);
 					readyQ.enqueue(p1);
-					pid_file = p1.processID;
+					pid_file = p1.getProcessID();
 				}
 			}
 		} else if (Flag.equals("userInput")) {
-			if (p.processID == pid_input) {
+			if (p.getProcessID() == pid_input) {
 				if (userInputBlockedQ.isEmpty())
 					userInput = true;
 				else {
 					Process p1 = (Process) userInputBlockedQ.dequeue();
-					p1.status = Status.READY;
+					p1.setStatus(Status.READY);
 					readyQ.enqueue(p1);
-					pid_input = p1.processID;
+					pid_input = p1.getProcessID();
 				}
 			}
 		}
 
 		else {
-			if (p.processID == pid_output) {
+			if (p.getProcessID() == pid_output) {
 				if (userOutputBlockedQ.isEmpty())
 					userOutput = true;
 				else {
 					Process p1 = (Process) userOutputBlockedQ.dequeue();
-					p1.status = Status.READY;
+					p1.setStatus(Status.READY);
 					readyQ.enqueue(p1);
-					pid_output = p1.processID;
+					pid_output = p1.getProcessID();
 				}
 			}
 		}

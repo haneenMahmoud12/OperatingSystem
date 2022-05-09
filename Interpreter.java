@@ -17,26 +17,28 @@ public class Interpreter {
 	public Mutex userOutput;
 	private QueueObj readyQ;
 	private QueueObj generalBlockedQ;
+	private QueueObj finishedProcessesQ;
 
-	public Interpreter(QueueObj readyQ, QueueObj generalBlockedQ) {
+	public Interpreter(QueueObj readyQ, QueueObj generalBlockedQ, QueueObj finishedProcessesQ) {
 		this.readyQ= readyQ;
 		this.generalBlockedQ= generalBlockedQ;
 		file = new Mutex("file",readyQ, generalBlockedQ);
 		userInput = new Mutex("userInput", readyQ, generalBlockedQ);
 		userOutput = new Mutex("userOutput", readyQ, generalBlockedQ);
+		this.instructions=new ArrayList<String>();
 	}
 
 	public void interpretation(int PID) throws IOException, FileNotFoundException {
 		BufferedReader br;
 		switch (PID) {
 		case 1:
-			br = new BufferedReader(new FileReader("Program_1.txt"));
+			br = new BufferedReader(new FileReader("C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_1.txt"));
 			break;
 		case 2:
-			br = new BufferedReader(new FileReader("Program_2.txt"));
+			br = new BufferedReader(new FileReader("C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_2.txt"));
 			break;
 		case 3:
-			br = new BufferedReader(new FileReader("Program_3.txt"));
+			br = new BufferedReader(new FileReader("C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_3.txt"));
 			break;
 		default:
 			br = null;
@@ -44,32 +46,36 @@ public class Interpreter {
 		String currentLine = br.readLine();
 		while (currentLine != null) {
 			instructions.add(currentLine);
+			currentLine = br.readLine();
 		}
 
 		// create new process that has PCB+program code(instructions).
 		Process p = new Process(PID, 0, Status.NEW, instructions);
-		p.status = Status.READY;
+		p.setStatus(Status.READY);
+		System.out.println("interpreter "+p.getInstructions().size());
 		readyQ.enqueue(p);
+		System.out.println(readyQ.peek().getInstructions());
+		instructions.clear();
 	}
 
-	public void convert(Process p, int timeSlice) throws IOException {
+	public void convert(Process p, int timeSlice, int time) throws IOException {
 		for (int i = 0; i < timeSlice; i++) {
-			String[] content = p.instructions.get(p.pc).split(" ");
-			if (p.instructions.get(i).toLowerCase().contains("print"))
+			String[] content = p.getInstructions().get(p.getPc()).split(" ");
+			if (p.getInstructions().get(i).toLowerCase().contains("print"))
 				SystemCalls.print(content[1]);
-			else if (p.instructions.get(p.pc).toLowerCase().contains("assign")) {
+			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("assign")) {
 				try {
 					SystemCalls.assign(Integer.parseInt(content[1]), Integer.parseInt(content[2]));
 				} catch (Exception e) {
 					SystemCalls.assign(content[1], content[2]);
 				}
-			} else if (p.instructions.get(p.pc).toLowerCase().contains("writeFile"))
+			} else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("writeFile"))
 				SystemCalls.writeFile(content[1], content[2]);
-			else if (p.instructions.get(p.pc).toLowerCase().contains("readFile"))
+			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("readFile"))
 				SystemCalls.readFile(content[1]);
-			else if (p.instructions.get(p.pc).toLowerCase().contains("printFromTo"))
+			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("printFromTo"))
 				SystemCalls.printFromTo(Integer.parseInt(content[1]), Integer.parseInt(content[2]));
-			else if (p.instructions.get(p.pc).toLowerCase().contains("semWait")) {
+			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("semWait")) {
 				if (content[1].equals("file")) {
 					file.semWait("file", p);
 				} else if (content[1].equals("userInput")) {
@@ -86,10 +92,68 @@ public class Interpreter {
 					userOutput.semSignal("userOutput", p);
 				}
 			}
-			System.out.println("Instrustion" +" "+ p.instructions.get(p.pc)+ " "+ "is currently executing");
-			p.pc++;
+			System.out.println("Instrustion" +" "+ p.getInstructions().get(p.getPc())+ " "+ "is currently executing");
+			
+			p.setPc((p.getPc())+1);;
+			time++;
 		}
 
+	}
+
+	public ArrayList<String> getInstructions() {
+		return instructions;
+	}
+
+	public void setInstructions(ArrayList<String> instructions) {
+		this.instructions = instructions;
+	}
+
+	public Mutex getFile() {
+		return file;
+	}
+
+	public void setFile(Mutex file) {
+		this.file = file;
+	}
+
+	public Mutex getUserInput() {
+		return userInput;
+	}
+
+	public void setUserInput(Mutex userInput) {
+		this.userInput = userInput;
+	}
+
+	public Mutex getUserOutput() {
+		return userOutput;
+	}
+
+	public void setUserOutput(Mutex userOutput) {
+		this.userOutput = userOutput;
+	}
+
+	public QueueObj getReadyQ() {
+		return readyQ;
+	}
+
+	public void setReadyQ(QueueObj readyQ) {
+		this.readyQ = readyQ;
+	}
+
+	public QueueObj getGeneralBlockedQ() {
+		return generalBlockedQ;
+	}
+
+	public void setGeneralBlockedQ(QueueObj generalBlockedQ) {
+		this.generalBlockedQ = generalBlockedQ;
+	}
+
+	public QueueObj getFinishedProcessesQ() {
+		return finishedProcessesQ;
+	}
+
+	public void setFinishedProcessesQ(QueueObj finishedProcessesQ) {
+		this.finishedProcessesQ = finishedProcessesQ;
 	}
 
 }
