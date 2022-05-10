@@ -19,7 +19,10 @@ public class Interpreter {
 	private QueueObj generalBlockedQ;
 	private QueueObj finishedProcessesQ;
 	private int time;
+//	private static ArrayList<ArrayList<Integer>> memoryIntegers;
+//	private static ArrayList<ArrayList<String>> memoryStrings;
 
+	//,ArrayList<ArrayList<Integer>> memoryIntegers,ArrayList<ArrayList<String>> memoryStrings
 	public Interpreter(QueueObj readyQ, QueueObj generalBlockedQ, QueueObj finishedProcessesQ, int time) {
 		this.readyQ= readyQ;
 		this.generalBlockedQ= generalBlockedQ;
@@ -29,6 +32,10 @@ public class Interpreter {
 		userOutput = new Mutex("userOutput", readyQ, generalBlockedQ);
 		this.instructions=new ArrayList<String>();
 		this.time=time;
+//		SystemCalls systemCalls = new SystemCalls();
+		
+//		this.memoryIntegers=memoryIntegers;
+//		this.memoryStrings=memoryStrings;
 	}
 
 	public void interpretation(int PID) throws IOException, FileNotFoundException {
@@ -59,6 +66,8 @@ public class Interpreter {
 	}
 
 	public void convert(Process p, int timeSlice) throws IOException {
+		//SystemCalls sysCalls = new SystemCalls();
+		
 		for (int i = 0; i < timeSlice; i++) {
 			if(p.getPc()==p.getInstructions().size()){
 				p.setStatus(Status.FINISHED);
@@ -72,7 +81,7 @@ public class Interpreter {
 			}
 			String[] content = p.getInstructions().get(p.getPc()).split(" ");
 			if (p.getInstructions().get(i).toLowerCase().contains("print"))
-				SystemCalls.print(content[1]);
+				SystemCalls.print(content[1], p.getProcessID());
 			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("assign")) {
 				if(content[2].equals("readFile")) {
 					Scanner sc = new Scanner(System.in);
@@ -80,20 +89,22 @@ public class Interpreter {
 					String input = sc.next();
 					try {
 						int y = Integer.parseInt(input);
-						SystemCalls.assignInput(content[1], y,p.getProcessID(),p.getPc());
-						time++;
+						SystemCalls.assign(content[1], y,p.getProcessID());
+						p.setPc((p.getPc())+1);
+						this.time++;
 						break;
 					} catch(Exception e) {
 						String y = input;
-						SystemCalls.assignInput(content[1], y,p.getProcessID(),p.getPc());
-						time++;
+						SystemCalls.assign(content[1], y,p.getProcessID());
+						p.setPc((p.getPc())+1);
+						this.time++;
 						break;
 					}
 				} else {
 					try {
-						SystemCalls.assign(content[1], Integer.parseInt(content[2]), p.getProcessID(), p.getPc());
+						SystemCalls.assign(content[1], Integer.parseInt(content[content.length-1]), p.getProcessID());
 					} catch (Exception e) {
-						SystemCalls.assign(content[1], content[2], p.getProcessID(), p.getPc());
+						SystemCalls.assign(content[1], content[content.length-1], p.getProcessID());
 					}
 				}
 					

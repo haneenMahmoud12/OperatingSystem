@@ -7,12 +7,16 @@ public class Main {
 	private static QueueObj readyQ;
 	private static QueueObj generalBlockedQ;
 	private static QueueObj finishedProcessesQ;
-	public static int time;
+	private static int time;
+	private static ArrayList<ArrayList<Integer>> memoryIntegers;
+	private static ArrayList<ArrayList<String>> memoryStrings;
 	public Main() {
 		this.readyQ = new QueueObj(3);
 		this.generalBlockedQ = new QueueObj(3);
 		this.finishedProcessesQ = new QueueObj(3);
 		this.time=0;
+		this.memoryIntegers = new ArrayList<ArrayList<Integer>>();
+		this.memoryStrings = new ArrayList<ArrayList<String>>();
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -44,6 +48,15 @@ public class Main {
 		
 		Main m = new Main();
 		Interpreter ip = new Interpreter(readyQ, generalBlockedQ,finishedProcessesQ,time);
+		memoryIntegers.add(new ArrayList<Integer>());
+		memoryIntegers.add(new ArrayList<Integer>());
+		memoryIntegers.add(new ArrayList<Integer>());
+		memoryStrings.add(new ArrayList<String>());
+		memoryStrings.add(new ArrayList<String>());
+		memoryStrings.add(new ArrayList<String>());
+		SystemCalls systemCalls = new SystemCalls(memoryIntegers,memoryStrings);
+		
+		//,memoryIntegers,memoryStrings
 		
 		Scheduler s = new Scheduler(timeSlice,ip,time);
 		while(!finishedProcessesQ.isFull()) {
