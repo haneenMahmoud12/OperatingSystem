@@ -9,28 +9,69 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import com.sun.tools.javac.code.Attribute.Array;
+
 public class SystemCalls {
-	static ArrayList<Integer> memoryIntegers;
-	static ArrayList<String> memoryStrings;
+//	private ArrayList<Integer> p1Ints = new ArrayList<>();
+//	private ArrayList<Integer> p2Ints = new ArrayList<>();
+//	private ArrayList<Integer> p3Ints = new ArrayList<>();
+	private static ArrayList<ArrayList<Integer>> memoryIntegers = new ArrayList<>();
+	private static ArrayList<String> p1Strings = new ArrayList<>();
+	private ArrayList<String> p2Strings = new ArrayList<>();
+	private ArrayList<Integer> p3Strings = new ArrayList<>();
+	private static ArrayList<ArrayList<String>> memoryStrings = new ArrayList<>();
+//	
+//	public SystemCalls() {
+//		this.memoryIntegers.add(p1Ints);
+//		this.memoryIntegers.add(p2Ints);
+//		this.memoryIntegers.add(p3Ints);
+//		this.memoryStrings.add(p1Strings);
+//		this.memoryStrings.add(p2Strings);
+//		this.memoryStrings.add(p3Strings);
+//	}
 	
 	public static void print(String x) {
 		//do we need to check the memory for x?
 		System.out.println(x);
 	}
-	public static void assign(int x,int y) {
-		//taking input
-		memoryIntegers.add(y);
-		x=memoryIntegers.get(memoryIntegers.indexOf(y));
+	public static void assign(String x, int y, int pid, int pc) {
+		
+		
 	}
-	public static void assign(String x,String y) {
-		//taking input
-		memoryStrings.add(y);
-		x=memoryStrings.get(memoryStrings.indexOf(y));
+	public static void assign(String x, String y, int pid, int pc) {
+		
 	}
-//	public static void assign(String x) {
+	public static void assignInput(String x, String y, int pid, int pc) {
+		
+	}
+public static void assignInput(String x, int y, int pid, int pc) {
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+//	public static void assign(String x,int y) {
+//		
+//		memoryIntegers.add(y);
+//		x=memoryIntegers.get(memoryIntegers.indexOf(y));
+//	}
+//	public static void assign(String x,String y) {
+//		//taking input
+//		memoryStrings.add(y);
+//		x=memoryStrings.get(memoryStrings.indexOf(y));
+//	}
+//	public static void assignInt(String x) {
 //		Scanner sc = new Scanner(System.in);
 //		System.out.println("Please enter a value");
-//		String y = sc.next();
+//		String y = sc.nextInt();
 //		memoryStrings.add(y);
 //		x=memoryStrings.get(memoryStrings.indexOf(y));
 //	}
@@ -58,7 +99,7 @@ public class SystemCalls {
 			System.out.print(i+" ");
 		}
 	}
-	public void readFromMemory() {
+	public void readFromMemory(int processID) {
 		for(int i=0;i<memoryIntegers.size();i++) {
 			System.out.println(memoryIntegers.get(i));
 		}

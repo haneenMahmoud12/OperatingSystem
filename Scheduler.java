@@ -8,13 +8,14 @@ public class Scheduler {
 	private QueueObj readyQ;
 	private QueueObj generalBlockedQ;
 	private Interpreter interpreter;
+	private int time;
 
-
-	public Scheduler(int timeSlice, Interpreter interpreter) {
+	public Scheduler(int timeSlice, Interpreter interpreter,int time) {
 		this.timeSlice = timeSlice;
 		this.interpreter = interpreter;
 		this.readyQ=interpreter.getReadyQ();
 		this.generalBlockedQ=interpreter.getGeneralBlockedQ();
+		this.time=time;
 	}
 
 	public int getTimeSlice() {
@@ -25,21 +26,20 @@ public class Scheduler {
 		this.timeSlice = timeSlice;
 	}
 
-	public void scheduling(int time) throws IOException {
+	public void scheduling() throws IOException {
 		while (!readyQ.isEmpty()) {
 			Process p =readyQ.dequeue();
 			p.setStatus(Status.RUNNING);
+			System.out.println(time);
 			System.out.println("Program" +" "+ p.getProcessID() +" "+ "is currently executing");
 			System.out.println("ready Queue");
 			readyQ.printQueue();
 			System.out.println("Blocked Queue");
 			generalBlockedQ.printQueue();
-			System.out.println("scheduler "+p.getInstructions().size());
-			interpreter.convert(p, timeSlice,time);
-			if (p.getPc() > p.getInstructions().size()) {
+			interpreter.convert(p, timeSlice);
+			if (p.getPc()== p.getInstructions().size()) {
 				p.setStatus(Status.FINISHED);
 				interpreter.getFinishedProcessesQ().enqueue(p);
-				//interpreter.finishedProcessesQ.enqueue(p);
 				System.out.println("ready Queue");
 				readyQ.printQueue();
 				System.out.println("Blocked Queue");
@@ -57,6 +57,30 @@ public class Scheduler {
 
 	public void setReadyQ(QueueObj readyQ) {
 		this.readyQ = readyQ;
+	}
+
+	public QueueObj getGeneralBlockedQ() {
+		return generalBlockedQ;
+	}
+
+	public void setGeneralBlockedQ(QueueObj generalBlockedQ) {
+		this.generalBlockedQ = generalBlockedQ;
+	}
+
+	public Interpreter getInterpreter() {
+		return interpreter;
+	}
+
+	public void setInterpreter(Interpreter interpreter) {
+		this.interpreter = interpreter;
+	}
+
+	public int getTime() {
+		return time;
+	}
+
+	public void setTime(int time) {
+		this.time = time;
 	}
 
 }

@@ -7,11 +7,12 @@ public class Main {
 	private static QueueObj readyQ;
 	private static QueueObj generalBlockedQ;
 	private static QueueObj finishedProcessesQ;
-
+	public static int time;
 	public Main() {
 		this.readyQ = new QueueObj(3);
 		this.generalBlockedQ = new QueueObj(3);
 		this.finishedProcessesQ = new QueueObj(3);
+		this.time=0;
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -42,21 +43,21 @@ public class Main {
 		int time4Process3 = tp3.nextInt();
 		
 		Main m = new Main();
-		Interpreter ip = new Interpreter(readyQ, generalBlockedQ,finishedProcessesQ);
-		int time = 0;
-		Scheduler s = new Scheduler(timeSlice,ip);
+		Interpreter ip = new Interpreter(readyQ, generalBlockedQ,finishedProcessesQ,time);
+		
+		Scheduler s = new Scheduler(timeSlice,ip,time);
 		while(!finishedProcessesQ.isFull()) {
 			if(time==time4Process1) {
 				ip.interpretation(p1id);
-				s.scheduling(time);
+				s.scheduling();
 			}
 			else if(time==time4Process2) {
 				ip.interpretation(p2id);
-				s.scheduling(time);
+				s.scheduling();
 			}
 			else if(time==time4Process3){
 				ip.interpretation(p3id);
-				s.scheduling(time);
+				s.scheduling();
 			}
 			else
 				time++;

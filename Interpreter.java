@@ -18,14 +18,17 @@ public class Interpreter {
 	private QueueObj readyQ;
 	private QueueObj generalBlockedQ;
 	private QueueObj finishedProcessesQ;
+	private int time;
 
-	public Interpreter(QueueObj readyQ, QueueObj generalBlockedQ, QueueObj finishedProcessesQ) {
+	public Interpreter(QueueObj readyQ, QueueObj generalBlockedQ, QueueObj finishedProcessesQ, int time) {
 		this.readyQ= readyQ;
 		this.generalBlockedQ= generalBlockedQ;
+		this.finishedProcessesQ=finishedProcessesQ;
 		file = new Mutex("file",readyQ, generalBlockedQ);
 		userInput = new Mutex("userInput", readyQ, generalBlockedQ);
 		userOutput = new Mutex("userOutput", readyQ, generalBlockedQ);
 		this.instructions=new ArrayList<String>();
+		this.time=time;
 	}
 
 	public void interpretation(int PID) throws IOException, FileNotFoundException {
@@ -52,23 +55,48 @@ public class Interpreter {
 		// create new process that has PCB+program code(instructions).
 		Process p = new Process(PID, 0, Status.NEW, instructions);
 		p.setStatus(Status.READY);
-		System.out.println("interpreter "+p.getInstructions().size());
 		readyQ.enqueue(p);
-		System.out.println(readyQ.peek().getInstructions());
-		instructions.clear();
 	}
 
-	public void convert(Process p, int timeSlice, int time) throws IOException {
+	public void convert(Process p, int timeSlice) throws IOException {
 		for (int i = 0; i < timeSlice; i++) {
+			if(p.getPc()==p.getInstructions().size()){
+				p.setStatus(Status.FINISHED);
+				finishedProcessesQ.enqueue(p);
+				System.out.println("ready Queue");
+				readyQ.printQueue();
+				System.out.println("Blocked Queue");
+				generalBlockedQ.printQueue();
+				this.time++;
+				break;
+			}
 			String[] content = p.getInstructions().get(p.getPc()).split(" ");
 			if (p.getInstructions().get(i).toLowerCase().contains("print"))
 				SystemCalls.print(content[1]);
 			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("assign")) {
-				try {
-					SystemCalls.assign(Integer.parseInt(content[1]), Integer.parseInt(content[2]));
-				} catch (Exception e) {
-					SystemCalls.assign(content[1], content[2]);
+				if(content[2].equals("readFile")) {
+					Scanner sc = new Scanner(System.in);
+					System.out.print("Please enter a value");
+					String input = sc.next();
+					try {
+						int y = Integer.parseInt(input);
+						SystemCalls.assignInput(content[1], y,p.getProcessID(),p.getPc());
+						time++;
+						break;
+					} catch(Exception e) {
+						String y = input;
+						SystemCalls.assignInput(content[1], y,p.getProcessID(),p.getPc());
+						time++;
+						break;
+					}
+				} else {
+					try {
+						SystemCalls.assign(content[1], Integer.parseInt(content[2]), p.getProcessID(), p.getPc());
+					} catch (Exception e) {
+						SystemCalls.assign(content[1], content[2], p.getProcessID(), p.getPc());
+					}
 				}
+					
 			} else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("writeFile"))
 				SystemCalls.writeFile(content[1], content[2]);
 			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("readFile"))
@@ -83,7 +111,7 @@ public class Interpreter {
 				} else {
 					userOutput.semWait("userOutput", p);
 				}
-			} else {
+			} else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("semSignal")) {
 				if (content[1].equals("file")) {
 					file.semSignal("file", p);
 				} else if (content[1].equals("userInput")) {
@@ -92,10 +120,10 @@ public class Interpreter {
 					userOutput.semSignal("userOutput", p);
 				}
 			}
-			System.out.println("Instrustion" +" "+ p.getInstructions().get(p.getPc())+ " "+ "is currently executing");
 			
-			p.setPc((p.getPc())+1);;
-			time++;
+			System.out.println("Instrustion" +" "+ p.getInstructions().get(p.getPc())+ " "+ "is currently executing");
+			p.setPc((p.getPc())+1);
+			this.time++;
 		}
 
 	}
