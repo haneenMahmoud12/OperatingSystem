@@ -106,10 +106,8 @@ public class Mutex {
 					userInput = true;
 				else {
 					Process p1 = (Process) userInputBlockedQ.dequeue();
-					System.out.println("p1 id: "+p1.getProcessID());
 					for(int i=0;i<Main.getGeneralBlockedQ().size();i++) {
 						Process p2 = Main.getGeneralBlockedQ().dequeue();
-						System.out.println("p2 id: "+p2.getProcessID());
 						if(p2.getProcessID()!=p1.getProcessID()) {
 							Main.getGeneralBlockedQ().enqueue(p2);
 						} else

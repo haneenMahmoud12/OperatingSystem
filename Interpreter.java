@@ -11,7 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Interpreter {
-	public ArrayList<String> instructions;
+//	public ArrayList<String> instructionsHere;
 	public Mutex file;
 	public Mutex userInput;
 	public Mutex userOutput;
@@ -19,32 +19,36 @@ public class Interpreter {
 		file = new Mutex("file");
 		userInput = new Mutex("userInput");
 		userOutput = new Mutex("userOutput");
-		this.instructions=new ArrayList<String>();
+//		instructionsHere=new ArrayList<String>();
 	}
 
 	public void interpretation(int PID) throws IOException, FileNotFoundException {
+		ArrayList<String> instructionsHere=new ArrayList<String>();
 		BufferedReader br;
 		switch (PID) {
-		case 1:
+		case 1:{
 			br = new BufferedReader(new FileReader("C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_1.txt"));
 			break;
-		case 2:
+		}
+		case 2:{
 			br = new BufferedReader(new FileReader("C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_2.txt"));
 			break;
-		case 3:
+		}
+		case 3:{
 			br = new BufferedReader(new FileReader("C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_3.txt"));
 			break;
+		}
 		default:
 			br = null;
 		}
 		String currentLine = br.readLine();
 		while (currentLine != null) {
-			instructions.add(currentLine);
+			instructionsHere.add(currentLine);
 			currentLine = br.readLine();
 		}
 
 		// create new process that has PCB+program code(instructions).
-		Process p = new Process(PID, 0, Status.NEW, instructions);
+		Process p = new Process(PID, 0, Status.NEW, instructionsHere);
 		p.setStatus(Status.READY);
 		Main.getReadyQ().enqueue(p);
 		System.out.println("ready Queue:");
@@ -57,21 +61,9 @@ public class Interpreter {
 		
 		for (int i = 0; i < Main.getTimeSlice(); i++) {
 			if(p.getPc()==p.getInstructions().size()){
-				p.setStatus(Status.FINISHED);
-				Main.getFinishedProcessesQ().enqueue(p);
-				System.out.println("ready Queue");
-				Main.getReadyQ().printQueue();
-				System.out.println("Blocked Queue");
-				Main.getGeneralBlockedQ().printQueue();
 				Main.setTime(Main.getTime()+1);
-				if(Main.getTime()==Main.getTime4Process1()) {
-					Main.getIp().interpretation(Main.getP1id());
-				}
-				else if(Main.getTime()==Main.getTime4Process2()) {
-					Main.getIp().interpretation(Main.getP2id());
-				}
-				else if(Main.getTime()==Main.getTime4Process3()){
-					Main.getIp().interpretation(Main.getP3id());
+				if(i<Main.getTimeSlice()) {
+					Main.setTimeSliceNotOver(true);
 				}
 				break;
 			}
@@ -87,7 +79,8 @@ public class Interpreter {
 				break;
 			}
 			else {
-			System.out.println("Instrustion" +" "+ p.getInstructions().get(p.getPc())+ " "+ "is currently executing");
+				System.out.println(p.getInstructions());
+			System.out.println("PC="+p.getPc()+". Instrustion" +" "+ p.getInstructions().get(p.getPc())+ " from program "+p.getProcessID()+ " "+ "is currently executing");
 			String[] content = p.getInstructions().get(p.getPc()).split(" ");
 			if (p.getInstructions().get(i).contains("print"))
 				SystemCalls.print(content[1], p.getProcessID());
@@ -154,16 +147,15 @@ public class Interpreter {
 			}
 		}
 		}
-
 	}
 
-	public ArrayList<String> getInstructions() {
-		return instructions;
-	}
-
-	public void setInstructions(ArrayList<String> instructions) {
-		this.instructions = instructions;
-	}
+//	public ArrayList<String> getInstructions() {
+//		return instructionsHere;
+//	}
+//
+//	public void setInstructions(ArrayList<String> instructions) {
+//		this.instructionsHere = instructions;
+//	}
 
 	public Mutex getFile() {
 		return file;

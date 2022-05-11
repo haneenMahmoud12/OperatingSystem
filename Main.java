@@ -11,6 +11,7 @@ public class Main {
 	private static ArrayList<ArrayList<Integer>> memoryIntegers;
 	private static ArrayList<ArrayList<String>> memoryStrings;
 	private static int timeSlice;
+	private static boolean timeSliceNotOver;
 	private static Interpreter ip;
 	private static int p1id;
 	private static int time4Process1;
@@ -19,13 +20,14 @@ public class Main {
 	private static int p3id;
 	private static int time4Process3;
 	public Main() {
-		this.readyQ = new QueueObj(3);
-		this.generalBlockedQ = new QueueObj(3);
-		this.finishedProcessesQ = new QueueObj(3);
-		this.time=0;
-		this.memoryIntegers = new ArrayList<ArrayList<Integer>>();
-		this.memoryStrings = new ArrayList<ArrayList<String>>();
-		this.ip = new Interpreter();
+		readyQ = new QueueObj(3);
+		generalBlockedQ = new QueueObj(3);
+		finishedProcessesQ = new QueueObj(3);
+		time=0;
+		memoryIntegers = new ArrayList<ArrayList<Integer>>();
+		memoryStrings = new ArrayList<ArrayList<String>>();
+		ip = new Interpreter();
+		timeSliceNotOver = false;
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -181,6 +183,14 @@ public class Main {
 
 	public static void setTime4Process3(int time4Process3) {
 		Main.time4Process3 = time4Process3;
+	}
+
+	public static boolean isTimeSliceNotOver() {
+		return timeSliceNotOver;
+	}
+
+	public static void setTimeSliceNotOver(boolean timeSliceNotOver) {
+		Main.timeSliceNotOver = timeSliceNotOver;
 	}
 
 
