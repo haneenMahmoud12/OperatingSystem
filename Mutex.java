@@ -13,10 +13,8 @@ public class Mutex {
 	private int pid_file;
 	private int pid_input;
 	private int pid_output;
-	private QueueObj readyQ;
-	private QueueObj generalBlockedQ;
 
-	public Mutex(String m, QueueObj readyQ, QueueObj generalBlockedQ) {
+	public Mutex(String m) {
 		if (m.equals("file")) {
 			this.file = true;
 			fileBlockedQ = new QueueObj(3);
@@ -39,12 +37,12 @@ public class Mutex {
 				pid_file = p.getProcessID();
 			} else {
 				this.fileBlockedQ.enqueue(p);
-				generalBlockedQ.enqueue(p);
+				Main.getGeneralBlockedQ().enqueue(p);
 				p.setStatus(Status.BLOCKED);;
 				System.out.println("ready Queue");
-				readyQ.printQueue();
+				Main.getReadyQ().printQueue();
 				System.out.println("Blocked Queue");
-				generalBlockedQ.printQueue();
+				Main.getGeneralBlockedQ().printQueue();
 				System.out.println("File Blocked Queue");
 				fileBlockedQ.printQueue();
 			}
@@ -54,12 +52,12 @@ public class Mutex {
 				pid_input = p.getProcessID();
 			} else {
 				this.userInputBlockedQ.enqueue(p);
-				generalBlockedQ.enqueue(p);
+				Main.getGeneralBlockedQ().enqueue(p);
 				p.setStatus(Status.BLOCKED);
 				System.out.println("ready Queue");
-				readyQ.printQueue();
+				Main.getReadyQ().printQueue();
 				System.out.println("Blocked Queue");
-				generalBlockedQ.printQueue();
+				Main.getGeneralBlockedQ().printQueue();
 				System.out.println("User Input Blocked Queue");
 				userInputBlockedQ.printQueue();
 			}
@@ -69,12 +67,12 @@ public class Mutex {
 				pid_output = p.getProcessID();
 			} else {
 				this.userOutputBlockedQ.enqueue(p);
-				generalBlockedQ.enqueue(p);
+				Main.getGeneralBlockedQ().enqueue(p);
 				p.setStatus(Status.BLOCKED);
 				System.out.println("ready Queue");
-				readyQ.printQueue();
+				Main.getReadyQ().printQueue();
 				System.out.println("Blocked Queue");
-				generalBlockedQ.printQueue();
+				Main.getReadyQ().printQueue();
 				System.out.println("User Output Blocked Queue");
 				userOutputBlockedQ.printQueue();
 			}
@@ -90,7 +88,7 @@ public class Mutex {
 				else {
 					Process p1 = (Process) fileBlockedQ.dequeue();
 					p1.setStatus(Status.READY);
-					readyQ.enqueue(p1);
+					Main.getReadyQ().enqueue(p1);
 					pid_file = p1.getProcessID();
 				}
 			}
@@ -101,7 +99,7 @@ public class Mutex {
 				else {
 					Process p1 = (Process) userInputBlockedQ.dequeue();
 					p1.setStatus(Status.READY);
-					readyQ.enqueue(p1);
+					Main.getReadyQ().enqueue(p1);
 					pid_input = p1.getProcessID();
 				}
 			}
@@ -114,7 +112,7 @@ public class Mutex {
 				else {
 					Process p1 = (Process) userOutputBlockedQ.dequeue();
 					p1.setStatus(Status.READY);
-					readyQ.enqueue(p1);
+					Main.getReadyQ().enqueue(p1);
 					pid_output = p1.getProcessID();
 				}
 			}

@@ -10,6 +10,14 @@ public class Main {
 	private static int time;
 	private static ArrayList<ArrayList<Integer>> memoryIntegers;
 	private static ArrayList<ArrayList<String>> memoryStrings;
+	private static int timeSlice;
+	private static Interpreter ip;
+	private static int p1id;
+	private static int time4Process1;
+	private static int p2id;
+	private static int time4Process2;
+	private static int p3id;
+	private static int time4Process3;
 	public Main() {
 		this.readyQ = new QueueObj(3);
 		this.generalBlockedQ = new QueueObj(3);
@@ -17,37 +25,38 @@ public class Main {
 		this.time=0;
 		this.memoryIntegers = new ArrayList<ArrayList<Integer>>();
 		this.memoryStrings = new ArrayList<ArrayList<String>>();
+		this.ip = new Interpreter();
 	}
 
 	public static void main(String[] args) throws IOException {
 		Scanner ts = new Scanner(System.in);
 		System.out.println("Please enter a timeslice.");
-		int timeSlice = ts.nextInt();
+		timeSlice = ts.nextInt();
 		
 		
 		Scanner p1 = new Scanner(System.in);
 		System.out.println("Please enter the program number you want to start execution.");
-		int p1id = p1.nextInt();
+		p1id = p1.nextInt();
 		Scanner tp1 = new Scanner(System.in);
 		System.out.println("Please enter the time you want this program to start execution at.");
-		int time4Process1 = tp1.nextInt();
+		time4Process1 = tp1.nextInt();
 		
 		Scanner p2 = new Scanner(System.in);
 		System.out.println("Please enter the program number you want to start execution.");
-		int p2id = p2.nextInt();
+		p2id = p2.nextInt();
 		Scanner tp2 = new Scanner(System.in);
 		System.out.println("Please enter the time you want this program to start execution at.");
-		int time4Process2 = tp2.nextInt();
+		time4Process2 = tp2.nextInt();
 		
 		Scanner p3 = new Scanner(System.in);
 		System.out.println("Please enter the program number you want to start execution.");
-		int p3id = p3.nextInt();
+		p3id = p3.nextInt();
 		Scanner tp3 = new Scanner(System.in);
 		System.out.println("Please enter the time you want this program to start execution at.");
-		int time4Process3 = tp3.nextInt();
+		time4Process3 = tp3.nextInt();
 		
 		Main m = new Main();
-		Interpreter ip = new Interpreter(readyQ, generalBlockedQ,finishedProcessesQ,time);
+		
 		memoryIntegers.add(new ArrayList<Integer>());
 		memoryIntegers.add(new ArrayList<Integer>());
 		memoryIntegers.add(new ArrayList<Integer>());
@@ -58,33 +67,142 @@ public class Main {
 		
 		//,memoryIntegers,memoryStrings
 		
-		Scheduler s = new Scheduler(timeSlice,ip,time);
-		while(!finishedProcessesQ.isFull()) {
-			if(time==time4Process1) {
-				ip.interpretation(p1id);
-				s.scheduling();
-			}
-			else if(time==time4Process2) {
-				ip.interpretation(p2id);
-				s.scheduling();
-			}
-			else if(time==time4Process3){
-				ip.interpretation(p3id);
-				s.scheduling();
-			}
-			else
-				time++;
-		}
+		Scheduler s = new Scheduler();
+		s.scheduling();
+//		while(!finishedProcessesQ.isFull()) {
+//			if(time==time4Process1) {
+//				ip.interpretation(p1id);
+//				//s.scheduling();
+//			}
+//			else if(time==time4Process2) {
+//				ip.interpretation(p2id);
+//				//s.scheduling();
+//			}
+//			else if(time==time4Process3){
+//				ip.interpretation(p3id);
+//				//s.scheduling();
+//			}
+//			else
+//				time++;
+//			s.scheduling();
+//		}
 		
 		
 		
 	}
-	// Haneen
 
-	// Somaya
 
-	// Nada
+	public static QueueObj getReadyQ() {
+		return readyQ;
+	}
 
-	// Salma
+	public static void setReadyQ(QueueObj readyQ) {
+		Main.readyQ = readyQ;
+	}
+
+	public static QueueObj getGeneralBlockedQ() {
+		return generalBlockedQ;
+	}
+
+	public static void setGeneralBlockedQ(QueueObj generalBlockedQ) {
+		Main.generalBlockedQ = generalBlockedQ;
+	}
+
+	public static QueueObj getFinishedProcessesQ() {
+		return finishedProcessesQ;
+	}
+
+	public static void setFinishedProcessesQ(QueueObj finishedProcessesQ) {
+		Main.finishedProcessesQ = finishedProcessesQ;
+	}
+
+	public static int getTime() {
+		return time;
+	}
+
+	public static void setTime(int time) {
+		Main.time = time;
+	}
+
+	public static ArrayList<ArrayList<Integer>> getMemoryIntegers() {
+		return memoryIntegers;
+	}
+
+	public static void setMemoryIntegers(ArrayList<ArrayList<Integer>> memoryIntegers) {
+		Main.memoryIntegers = memoryIntegers;
+	}
+
+	public static ArrayList<ArrayList<String>> getMemoryStrings() {
+		return memoryStrings;
+	}
+
+	public static void setMemoryStrings(ArrayList<ArrayList<String>> memoryStrings) {
+		Main.memoryStrings = memoryStrings;
+	}
+
+	public static int getTimeSlice() {
+		return timeSlice;
+	}
+
+	public static void setTimeSlice(int timeSlice) {
+		Main.timeSlice = timeSlice;
+	}
+
+	public static Interpreter getIp() {
+		return ip;
+	}
+
+	public static void setIp(Interpreter ip) {
+		Main.ip = ip;
+	}
+
+	public static int getP1id() {
+		return p1id;
+	}
+
+	public static void setP1id(int p1id) {
+		Main.p1id = p1id;
+	}
+
+	public static int getTime4Process1() {
+		return time4Process1;
+	}
+
+	public static void setTime4Process1(int time4Process1) {
+		Main.time4Process1 = time4Process1;
+	}
+
+	public static int getP2id() {
+		return p2id;
+	}
+
+	public static void setP2id(int p2id) {
+		Main.p2id = p2id;
+	}
+
+	public static int getTime4Process2() {
+		return time4Process2;
+	}
+
+	public static void setTime4Process2(int time4Process2) {
+		Main.time4Process2 = time4Process2;
+	}
+
+	public static int getP3id() {
+		return p3id;
+	}
+
+	public static void setP3id(int p3id) {
+		Main.p3id = p3id;
+	}
+
+	public static int getTime4Process3() {
+		return time4Process3;
+	}
+
+	public static void setTime4Process3(int time4Process3) {
+		Main.time4Process3 = time4Process3;
+	}
+
 
 }

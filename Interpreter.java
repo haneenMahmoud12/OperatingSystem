@@ -15,23 +15,21 @@ public class Interpreter {
 	public Mutex file;
 	public Mutex userInput;
 	public Mutex userOutput;
-	private QueueObj readyQ;
-	private QueueObj generalBlockedQ;
-	private QueueObj finishedProcessesQ;
-	private int time;
+//	private QueueObj readyQ;
+//	private QueueObj generalBlockedQ;
+//	private QueueObj finishedProcessesQ;
 //	private static ArrayList<ArrayList<Integer>> memoryIntegers;
 //	private static ArrayList<ArrayList<String>> memoryStrings;
 
 	//,ArrayList<ArrayList<Integer>> memoryIntegers,ArrayList<ArrayList<String>> memoryStrings
-	public Interpreter(QueueObj readyQ, QueueObj generalBlockedQ, QueueObj finishedProcessesQ, int time) {
-		this.readyQ= readyQ;
-		this.generalBlockedQ= generalBlockedQ;
-		this.finishedProcessesQ=finishedProcessesQ;
-		file = new Mutex("file",readyQ, generalBlockedQ);
-		userInput = new Mutex("userInput", readyQ, generalBlockedQ);
-		userOutput = new Mutex("userOutput", readyQ, generalBlockedQ);
+	public Interpreter() {
+//		this.readyQ= readyQ;
+//		this.generalBlockedQ= generalBlockedQ;
+//		this.finishedProcessesQ=finishedProcessesQ;
+		file = new Mutex("file");
+		userInput = new Mutex("userInput");
+		userOutput = new Mutex("userOutput");
 		this.instructions=new ArrayList<String>();
-		this.time=time;
 //		SystemCalls systemCalls = new SystemCalls();
 		
 //		this.memoryIntegers=memoryIntegers;
@@ -62,21 +60,25 @@ public class Interpreter {
 		// create new process that has PCB+program code(instructions).
 		Process p = new Process(PID, 0, Status.NEW, instructions);
 		p.setStatus(Status.READY);
-		readyQ.enqueue(p);
+		Main.getReadyQ().enqueue(p);
+		System.out.println("ready Queue:");
+		Main.getReadyQ().printQueue();
+		System.out.println("Blocked Queue:");
+		Main.getGeneralBlockedQ().printQueue();
 	}
 
-	public void convert(Process p, int timeSlice) throws IOException {
+	public void convert(Process p) throws IOException {
 		//SystemCalls sysCalls = new SystemCalls();
 		
-		for (int i = 0; i < timeSlice; i++) {
+		for (int i = 0; i < Main.getTimeSlice(); i++) {
 			if(p.getPc()==p.getInstructions().size()){
 				p.setStatus(Status.FINISHED);
-				finishedProcessesQ.enqueue(p);
+				Main.getFinishedProcessesQ().enqueue(p);
 				System.out.println("ready Queue");
-				readyQ.printQueue();
+				Main.getReadyQ().printQueue();
 				System.out.println("Blocked Queue");
-				generalBlockedQ.printQueue();
-				this.time++;
+				Main.getGeneralBlockedQ().printQueue();
+				Main.setTime(Main.getTime()+1);
 				break;
 			}
 			String[] content = p.getInstructions().get(p.getPc()).split(" ");
@@ -91,13 +93,13 @@ public class Interpreter {
 						int y = Integer.parseInt(input);
 						SystemCalls.assign(content[1], y,p.getProcessID());
 						p.setPc((p.getPc())+1);
-						this.time++;
+						Main.setTime(Main.getTime()+1);
 						break;
 					} catch(Exception e) {
 						String y = input;
 						SystemCalls.assign(content[1], y,p.getProcessID());
 						p.setPc((p.getPc())+1);
-						this.time++;
+						Main.setTime(Main.getTime()+1);
 						break;
 					}
 				} else {
@@ -134,7 +136,7 @@ public class Interpreter {
 			
 			System.out.println("Instrustion" +" "+ p.getInstructions().get(p.getPc())+ " "+ "is currently executing");
 			p.setPc((p.getPc())+1);
-			this.time++;
+			Main.setTime(Main.getTime()+1);
 		}
 
 	}
@@ -171,28 +173,6 @@ public class Interpreter {
 		this.userOutput = userOutput;
 	}
 
-	public QueueObj getReadyQ() {
-		return readyQ;
-	}
 
-	public void setReadyQ(QueueObj readyQ) {
-		this.readyQ = readyQ;
-	}
-
-	public QueueObj getGeneralBlockedQ() {
-		return generalBlockedQ;
-	}
-
-	public void setGeneralBlockedQ(QueueObj generalBlockedQ) {
-		this.generalBlockedQ = generalBlockedQ;
-	}
-
-	public QueueObj getFinishedProcessesQ() {
-		return finishedProcessesQ;
-	}
-
-	public void setFinishedProcessesQ(QueueObj finishedProcessesQ) {
-		this.finishedProcessesQ = finishedProcessesQ;
-	}
 
 }

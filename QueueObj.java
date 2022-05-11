@@ -64,7 +64,7 @@ public class QueueObj
 			return;
 		}
 		for (int i = 0;i < nItems;i++) {
-			System.out.print(elements[(front + i)%maxsize] + "  ");
+			System.out.print(elements[(front + i)%maxsize].getProcessID() + "  ");
 		}
 		System.out.println();
 	}
