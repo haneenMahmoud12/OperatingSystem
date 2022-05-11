@@ -65,30 +65,9 @@ public class Main {
 		memoryStrings.add(new ArrayList<String>());
 		SystemCalls systemCalls = new SystemCalls(memoryIntegers,memoryStrings);
 		
-		//,memoryIntegers,memoryStrings
 		
 		Scheduler s = new Scheduler();
-		s.scheduling();
-//		while(!finishedProcessesQ.isFull()) {
-//			if(time==time4Process1) {
-//				ip.interpretation(p1id);
-//				//s.scheduling();
-//			}
-//			else if(time==time4Process2) {
-//				ip.interpretation(p2id);
-//				//s.scheduling();
-//			}
-//			else if(time==time4Process3){
-//				ip.interpretation(p3id);
-//				//s.scheduling();
-//			}
-//			else
-//				time++;
-//			s.scheduling();
-//		}
-		
-		
-		
+		s.scheduling();	
 	}
 
 

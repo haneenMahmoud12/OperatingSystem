@@ -12,13 +12,6 @@ import java.util.*;
 
 public class SystemCalls {
 	//The memory is split into two ArrayLists, one for integers and one for strings.
-	//Each ArrayList has 3 ArrayLists, one for each process.
-//	private static ArrayList<Integer> p1Ints = new ArrayList<>();
-//	private static ArrayList<Integer> p2Ints = new ArrayList<>();
-//	private static ArrayList<Integer> p3Ints = new ArrayList<>();
-//	private static ArrayList<String> p1Strings = new ArrayList<>();
-//	private static ArrayList<String> p2Strings = new ArrayList<>();
-//	private static ArrayList<String> p3Strings = new ArrayList<>();
 	private static ArrayList<ArrayList<Integer>> memoryIntegers = new ArrayList<ArrayList<Integer>>();
 	private static ArrayList<ArrayList<String>> memoryStrings = new ArrayList<ArrayList<String>>();
 	
@@ -68,37 +61,7 @@ public class SystemCalls {
 		value.put(memoryStrings.get(pid-1).get(indexOfX), memoryStrings.get(pid-1).get(indexOfY));
 		
 	}
-//	public static void assignInput(String x, String y, int pid, int pc) {
-//		
-//	}
-//public static void assignInput(String x, int y, int pid, int pc) {
-//		
-//	}
-//	
-//	public static void assign(String x,int y) {
-//		
-//		memoryIntegers.add(y);
-//		x=memoryIntegers.get(memoryIntegers.indexOf(y));
-//	}
-//	public static void assign(String x,String y) {
-//		//taking input
-//		memoryStrings.add(y);
-//		x=memoryStrings.get(memoryStrings.indexOf(y));
-//	}
-//	public static void assignInt(String x) {
-//		Scanner sc = new Scanner(System.in);
-//		System.out.println("Please enter a value");
-//		String y = sc.nextInt();
-//		memoryStrings.add(y);
-//		x=memoryStrings.get(memoryStrings.indexOf(y));
-//	}
-//	public static void assign(int x) {
-//		Scanner sc = new Scanner(System.in);
-//		System.out.println("Please enter a value");
-//		int y = sc.nextInt();
-//		memoryIntegers.add(y);
-//		x=memoryIntegers.get(memoryIntegers.indexOf(y));
-//	}
+
 	public static void writeFile(String x,String y) throws IOException {
 		//do we add extension to x e.g. .txt, or will x be filename.txt??????
 		      File newFile = new File(x);
@@ -117,9 +80,11 @@ public class SystemCalls {
 			currentLine = br.readLine();
 		}
 	}
-	public static void printFromTo(int x, int y) {
-		for(int i=x;i<=y;i++) {
-			System.out.print(i+" ");
+	public static void printFromTo(String x, String y) {
+		int x1 = (int) value.get(x);
+		int y1 = (int) value.get(y);
+		for(int i=x1;i<=y1;i++) {
+			System.out.println(i+" ");
 		}
 	}
 	public void readFromMemory(int processID) {

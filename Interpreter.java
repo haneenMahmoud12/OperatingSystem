@@ -15,25 +15,11 @@ public class Interpreter {
 	public Mutex file;
 	public Mutex userInput;
 	public Mutex userOutput;
-//	private QueueObj readyQ;
-//	private QueueObj generalBlockedQ;
-//	private QueueObj finishedProcessesQ;
-//	private static ArrayList<ArrayList<Integer>> memoryIntegers;
-//	private static ArrayList<ArrayList<String>> memoryStrings;
-
-	//,ArrayList<ArrayList<Integer>> memoryIntegers,ArrayList<ArrayList<String>> memoryStrings
 	public Interpreter() {
-//		this.readyQ= readyQ;
-//		this.generalBlockedQ= generalBlockedQ;
-//		this.finishedProcessesQ=finishedProcessesQ;
 		file = new Mutex("file");
 		userInput = new Mutex("userInput");
 		userOutput = new Mutex("userOutput");
 		this.instructions=new ArrayList<String>();
-//		SystemCalls systemCalls = new SystemCalls();
-		
-//		this.memoryIntegers=memoryIntegers;
-//		this.memoryStrings=memoryStrings;
 	}
 
 	public void interpretation(int PID) throws IOException, FileNotFoundException {
@@ -68,7 +54,6 @@ public class Interpreter {
 	}
 
 	public void convert(Process p) throws IOException {
-		//SystemCalls sysCalls = new SystemCalls();
 		
 		for (int i = 0; i < Main.getTimeSlice(); i++) {
 			if(p.getPc()==p.getInstructions().size()){
@@ -79,12 +64,34 @@ public class Interpreter {
 				System.out.println("Blocked Queue");
 				Main.getGeneralBlockedQ().printQueue();
 				Main.setTime(Main.getTime()+1);
+				if(Main.getTime()==Main.getTime4Process1()) {
+					Main.getIp().interpretation(Main.getP1id());
+				}
+				else if(Main.getTime()==Main.getTime4Process2()) {
+					Main.getIp().interpretation(Main.getP2id());
+				}
+				else if(Main.getTime()==Main.getTime4Process3()){
+					Main.getIp().interpretation(Main.getP3id());
+				}
 				break;
 			}
+			if(p.getStatus()==Status.BLOCKED) {
+				for(int j=0;j<Main.getReadyQ().size();j++) {
+					if(Main.getReadyQ().peek().getProcessID()==p.getProcessID()) {
+						Main.getReadyQ().dequeue();
+						break;
+					}
+					else
+						Main.getReadyQ().enqueue(Main.getReadyQ().dequeue());
+				}
+				break;
+			}
+			else {
+			System.out.println("Instrustion" +" "+ p.getInstructions().get(p.getPc())+ " "+ "is currently executing");
 			String[] content = p.getInstructions().get(p.getPc()).split(" ");
-			if (p.getInstructions().get(i).toLowerCase().contains("print"))
+			if (p.getInstructions().get(i).contains("print"))
 				SystemCalls.print(content[1], p.getProcessID());
-			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("assign")) {
+			else if (p.getInstructions().get(p.getPc()).contains("assign")) {
 				if(content[2].equals("readFile")) {
 					Scanner sc = new Scanner(System.in);
 					System.out.print("Please enter a value");
@@ -110,13 +117,13 @@ public class Interpreter {
 					}
 				}
 					
-			} else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("writeFile"))
+			} else if (p.getInstructions().get(p.getPc()).contains("writeFile"))
 				SystemCalls.writeFile(content[1], content[2]);
-			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("readFile"))
+			else if (p.getInstructions().get(p.getPc()).contains("readFile"))
 				SystemCalls.readFile(content[1]);
-			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("printFromTo"))
-				SystemCalls.printFromTo(Integer.parseInt(content[1]), Integer.parseInt(content[2]));
-			else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("semWait")) {
+			else if (p.getInstructions().get(p.getPc()).contains("printFromTo"))
+				SystemCalls.printFromTo(content[1], content[2]);
+			else if (p.getInstructions().get(p.getPc()).contains("semWait")) {
 				if (content[1].equals("file")) {
 					file.semWait("file", p);
 				} else if (content[1].equals("userInput")) {
@@ -124,7 +131,7 @@ public class Interpreter {
 				} else {
 					userOutput.semWait("userOutput", p);
 				}
-			} else if (p.getInstructions().get(p.getPc()).toLowerCase().contains("semSignal")) {
+			} else if (p.getInstructions().get(p.getPc()).contains("semSignal")) {
 				if (content[1].equals("file")) {
 					file.semSignal("file", p);
 				} else if (content[1].equals("userInput")) {
@@ -134,9 +141,18 @@ public class Interpreter {
 				}
 			}
 			
-			System.out.println("Instrustion" +" "+ p.getInstructions().get(p.getPc())+ " "+ "is currently executing");
 			p.setPc((p.getPc())+1);
 			Main.setTime(Main.getTime()+1);
+			if(Main.getTime()==Main.getTime4Process1()) {
+				Main.getIp().interpretation(Main.getP1id());
+			}
+			else if(Main.getTime()==Main.getTime4Process2()) {
+				Main.getIp().interpretation(Main.getP2id());
+			}
+			else if(Main.getTime()==Main.getTime4Process3()){
+				Main.getIp().interpretation(Main.getP3id());
+			}
+		}
 		}
 
 	}
