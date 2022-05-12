@@ -20,14 +20,13 @@ public class Main {
 	private static int p3id;
 	private static int time4Process3;
 	public static QueueObj availableProcessesQ;
+
 	public Main() {
 		readyQ = new QueueObj(3);
 		generalBlockedQ = new QueueObj(3);
 		finishedProcessesQ = new QueueObj(3);
 		availableProcessesQ = new QueueObj(3);
-		time=0;
-//		memoryIntegers = new ArrayList<ArrayList<Integer>>();
-//		memoryStrings = new ArrayList<ArrayList<String>>();
+		time = 0;
 		ip = new Interpreter();
 		timeSliceNotOver = false;
 	}
@@ -36,35 +35,33 @@ public class Main {
 		Scanner ts = new Scanner(System.in);
 		System.out.println("Please enter a timeslice.");
 		timeSlice = ts.nextInt();
-		
-		
+
 		Scanner p1 = new Scanner(System.in);
 		System.out.println("Please enter the program number you want to start execution.");
 		p1id = p1.nextInt();
 		Scanner tp1 = new Scanner(System.in);
 		System.out.println("Please enter the time you want this program to start execution at.");
 		time4Process1 = tp1.nextInt();
-		
+
 		Scanner p2 = new Scanner(System.in);
 		System.out.println("Please enter the program number you want to start execution.");
 		p2id = p2.nextInt();
 		Scanner tp2 = new Scanner(System.in);
 		System.out.println("Please enter the time you want this program to start execution at.");
 		time4Process2 = tp2.nextInt();
-		
+
 		Scanner p3 = new Scanner(System.in);
 		System.out.println("Please enter the program number you want to start execution.");
 		p3id = p3.nextInt();
 		Scanner tp3 = new Scanner(System.in);
 		System.out.println("Please enter the time you want this program to start execution at.");
 		time4Process3 = tp3.nextInt();
-		
-		Main m = new Main();
-		
-		Scheduler s = new Scheduler();
-		s.scheduling();	
-	}
 
+		Main m = new Main();
+
+		Scheduler s = new Scheduler();
+		s.scheduling();
+	}
 
 	public static QueueObj getReadyQ() {
 		return readyQ;
@@ -97,22 +94,6 @@ public class Main {
 	public static void setTime(int time) {
 		Main.time = time;
 	}
-
-//	public static ArrayList<ArrayList<Integer>> getMemoryIntegers() {
-//		return memoryIntegers;
-//	}
-//
-//	public static void setMemoryIntegers(ArrayList<ArrayList<Integer>> memoryIntegers) {
-//		Main.memoryIntegers = memoryIntegers;
-//	}
-//
-//	public static ArrayList<ArrayList<String>> getMemoryStrings() {
-//		return memoryStrings;
-//	}
-//
-//	public static void setMemoryStrings(ArrayList<ArrayList<String>> memoryStrings) {
-//		Main.memoryStrings = memoryStrings;
-//	}
 
 	public static int getTimeSlice() {
 		return timeSlice;
@@ -193,6 +174,5 @@ public class Main {
 	public static void setAvailableProcessesQ(QueueObj availableProcessesQ) {
 		Main.availableProcessesQ = availableProcessesQ;
 	}
-
 
 }
