@@ -60,14 +60,15 @@ public class Interpreter {
 	public void convert(Process p) throws IOException {
 		
 		for (int i = 0; i < Main.getTimeSlice(); i++) {
-			if(p.getPc()==p.getInstructions().size()){
+			
+			if(p.getPc()>=p.getInstructions().size()){
 				Main.setTime(Main.getTime()+1);
 				if(i<Main.getTimeSlice()) {
 					Main.setTimeSliceNotOver(true);
 				}
 				break;
 			}
-			if(p.getStatus()==Status.BLOCKED) {
+			else if(p.getStatus()==Status.BLOCKED) {
 				for(int j=0;j<Main.getReadyQ().size();j++) {
 					if(Main.getReadyQ().peek().getProcessID()==p.getProcessID()) {
 						Main.getReadyQ().dequeue();
@@ -80,72 +81,80 @@ public class Interpreter {
 			}
 			else {
 				System.out.println(p.getInstructions());
-			System.out.println("PC="+p.getPc()+". Instrustion" +" "+ p.getInstructions().get(p.getPc())+ " from program "+p.getProcessID()+ " "+ "is currently executing");
-			String[] content = p.getInstructions().get(p.getPc()).split(" ");
-			if (p.getInstructions().get(i).contains("print"))
+				System.out.println("PC="+p.getPc()+". Instrustion" +" "+ p.getInstructions().get(p.getPc())+ " from program "+p.getProcessID()+ " "+ "is currently executing");
+				String[] content = p.getInstructions().get(p.getPc()).split(" ");
+				if (p.getInstructions().get(i).contains("print"))
 				SystemCalls.print(content[1], p.getProcessID());
-			else if (p.getInstructions().get(p.getPc()).contains("assign")) {
-				if(content[2].equals("readFile")) {
-					Scanner sc = new Scanner(System.in);
-					System.out.print("Please enter a value");
-					String input = sc.next();
-					try {
-						int y = Integer.parseInt(input);
-						SystemCalls.assign(content[1], y,p.getProcessID());
-						p.setPc((p.getPc())+1);
-						Main.setTime(Main.getTime()+1);
-						break;
-					} catch(Exception e) {
-						String y = input;
-						SystemCalls.assign(content[1], y,p.getProcessID());
-						p.setPc((p.getPc())+1);
-						Main.setTime(Main.getTime()+1);
-						break;
+				else if (p.getInstructions().get(p.getPc()).contains("assign")) {
+					if(content[2].equals("readFile")) {
+						Scanner sc = new Scanner(System.in);
+						System.out.print("Please enter a value");
+						String input = sc.next();
+						try {
+							int y = Integer.parseInt(input);
+							SystemCalls.assign(content[1], y,p.getProcessID());
+							p.setPc((p.getPc())+1);
+							Main.setTime(Main.getTime()+1);
+							break;
+						} 
+						catch(Exception e) {
+							String y = input;
+							SystemCalls.assign(content[1], y,p.getProcessID());
+							p.setPc((p.getPc())+1);
+							Main.setTime(Main.getTime()+1);
+							break;
+						}
+					} 
+					else {
+						try {
+							SystemCalls.assign(content[1], Integer.parseInt(content[content.length-1]), p.getProcessID());
+						} 
+						catch (Exception e) {
+							SystemCalls.assign(content[1], content[content.length-1], p.getProcessID());
+						}
+					}		
+				} 
+				else if (p.getInstructions().get(p.getPc()).contains("writeFile"))
+					SystemCalls.writeFile(content[1], content[2]);
+				else if (p.getInstructions().get(p.getPc()).contains("readFile"))
+					SystemCalls.readFile(content[1]);
+				else if (p.getInstructions().get(p.getPc()).contains("printFromTo"))
+					SystemCalls.printFromTo(content[1], content[2],p.getProcessID());
+				else if (p.getInstructions().get(p.getPc()).contains("semWait")) {
+					if (content[1].equals("file")) {
+						file.semWait("file", p);
+					} 
+					else if (content[1].equals("userInput")) {
+						userInput.semWait("userInput", p);
+					} 
+					else {
+						userOutput.semWait("userOutput", p);
 					}
-				} else {
-					try {
-						SystemCalls.assign(content[1], Integer.parseInt(content[content.length-1]), p.getProcessID());
-					} catch (Exception e) {
-						SystemCalls.assign(content[1], content[content.length-1], p.getProcessID());
+				} 
+				else if (p.getInstructions().get(p.getPc()).contains("semSignal")) {
+					if (content[1].equals("file")) {
+						file.semSignal("file", p);
+					}
+					else if (content[1].equals("userInput")) {
+						userInput.semSignal("userInput", p);
+					}
+					else {
+						userOutput.semSignal("userOutput", p);
 					}
 				}
-					
-			} else if (p.getInstructions().get(p.getPc()).contains("writeFile"))
-				SystemCalls.writeFile(content[1], content[2]);
-			else if (p.getInstructions().get(p.getPc()).contains("readFile"))
-				SystemCalls.readFile(content[1]);
-			else if (p.getInstructions().get(p.getPc()).contains("printFromTo"))
-				SystemCalls.printFromTo(content[1], content[2]);
-			else if (p.getInstructions().get(p.getPc()).contains("semWait")) {
-				if (content[1].equals("file")) {
-					file.semWait("file", p);
-				} else if (content[1].equals("userInput")) {
-					userInput.semWait("userInput", p);
-				} else {
-					userOutput.semWait("userOutput", p);
-				}
-			} else if (p.getInstructions().get(p.getPc()).contains("semSignal")) {
-				if (content[1].equals("file")) {
-					file.semSignal("file", p);
-				} else if (content[1].equals("userInput")) {
-					userInput.semSignal("userInput", p);
-				} else {
-					userOutput.semSignal("userOutput", p);
-				}
-			}
 			
-			p.setPc((p.getPc())+1);
-			Main.setTime(Main.getTime()+1);
-			if(Main.getTime()==Main.getTime4Process1()) {
-				Main.getIp().interpretation(Main.getP1id());
+				p.setPc((p.getPc())+1);
+				Main.setTime(Main.getTime()+1);
+				if(Main.getTime()==Main.getTime4Process1()) {
+					Main.getIp().interpretation(Main.getP1id());
+				}
+				else if(Main.getTime()==Main.getTime4Process2()) {
+					Main.getIp().interpretation(Main.getP2id());
+				}
+				else if(Main.getTime()==Main.getTime4Process3()){
+					Main.getIp().interpretation(Main.getP3id());
+				}
 			}
-			else if(Main.getTime()==Main.getTime4Process2()) {
-				Main.getIp().interpretation(Main.getP2id());
-			}
-			else if(Main.getTime()==Main.getTime4Process3()){
-				Main.getIp().interpretation(Main.getP3id());
-			}
-		}
 		}
 	}
 

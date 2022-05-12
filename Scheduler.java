@@ -19,8 +19,11 @@ public class Scheduler {
 		else if(Main.getTime()==Main.getTime4Process3()){
 			Main.getIp().interpretation(Main.getP3id());
 		}
+		
 		while (!Main.getReadyQ().isEmpty()) {
+			
 			Process p =Main.getReadyQ().dequeue();
+			
 			p.setStatus(Status.RUNNING);
 			System.out.println("Time: "+Main.getTime());
 			System.out.println("Program" +" "+ p.getProcessID() +" "+ "is currently executing");
@@ -28,8 +31,10 @@ public class Scheduler {
 			Main.getReadyQ().printQueue();
 			System.out.println("Blocked Queue:");
 			Main.getGeneralBlockedQ().printQueue();
+			
 			Main.getIp().convert(p);
-			if (p.getPc()== p.getInstructions().size()) {
+			
+			if (p.getPc()>= p.getInstructions().size()) {
 				p.setStatus(Status.FINISHED);
 				Main.getFinishedProcessesQ().enqueue(p);
 				System.out.println("ready Queue");
@@ -38,25 +43,23 @@ public class Scheduler {
 				Main.getGeneralBlockedQ().printQueue();
 				
 				//if a process finished before finishing timeSlice
-				if(Main.isTimeSliceNotOver()==true) {
-					Process p1 =Main.getReadyQ().dequeue();
-					//System.out.println("ddefe"+p.getProcessID());
-					p1.setStatus(Status.RUNNING);
-					System.out.println("Time: "+Main.getTime());
-					System.out.println("Program" +" "+ p1.getProcessID() +" "+ "is currently executing");
-					System.out.println("ready Queue:");
-					Main.getReadyQ().printQueue();
-					System.out.println("Blocked Queue:");
-					Main.getGeneralBlockedQ().printQueue();
-					Main.getIp().convert(p1);
-				}
+//				if(Main.isTimeSliceNotOver()==true) {
+//					Process p1 =Main.getReadyQ().dequeue();
+//					p1.setStatus(Status.RUNNING);
+//					System.out.println("Time: "+Main.getTime());
+//					System.out.println("Program" +" "+ p1.getProcessID() +" "+ "is currently executing");
+//					System.out.println("ready Queue:");
+//					Main.getReadyQ().printQueue();
+//					System.out.println("Blocked Queue:");
+//					Main.getGeneralBlockedQ().printQueue();
+//					Main.getIp().convert(p1);
+//				}
 			}
+			//Main.getReadyQ().peek().getProcessID()==p.getProcessID()
 			else if(p.getStatus()!=Status.BLOCKED) {
 				p.setStatus(Status.READY);
-				if(Main.getReadyQ().peek().getProcessID()==p.getProcessID())
-					break;
-				else
-					Main.getReadyQ().enqueue(p);
+				if(Main.getReadyQ().isEmpty()==true || Main.getReadyQ().peek().getProcessID()!=p.getProcessID())
+					Main.getReadyQ().enqueue(p);	
 			}
 			if(Main.getTime()==Main.getTime4Process1()) {
 				Main.getIp().interpretation(Main.getP1id());

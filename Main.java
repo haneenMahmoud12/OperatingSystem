@@ -8,8 +8,8 @@ public class Main {
 	private static QueueObj generalBlockedQ;
 	private static QueueObj finishedProcessesQ;
 	private static int time;
-	private static ArrayList<ArrayList<Integer>> memoryIntegers;
-	private static ArrayList<ArrayList<String>> memoryStrings;
+//	private static ArrayList<ArrayList<Integer>> memoryIntegers;
+//	private static ArrayList<ArrayList<String>> memoryStrings;
 	private static int timeSlice;
 	private static boolean timeSliceNotOver;
 	private static Interpreter ip;
@@ -19,13 +19,15 @@ public class Main {
 	private static int time4Process2;
 	private static int p3id;
 	private static int time4Process3;
+	public static QueueObj availableProcessesQ;
 	public Main() {
 		readyQ = new QueueObj(3);
 		generalBlockedQ = new QueueObj(3);
 		finishedProcessesQ = new QueueObj(3);
+		availableProcessesQ = new QueueObj(3);
 		time=0;
-		memoryIntegers = new ArrayList<ArrayList<Integer>>();
-		memoryStrings = new ArrayList<ArrayList<String>>();
+//		memoryIntegers = new ArrayList<ArrayList<Integer>>();
+//		memoryStrings = new ArrayList<ArrayList<String>>();
 		ip = new Interpreter();
 		timeSliceNotOver = false;
 	}
@@ -58,15 +60,6 @@ public class Main {
 		time4Process3 = tp3.nextInt();
 		
 		Main m = new Main();
-		
-		memoryIntegers.add(new ArrayList<Integer>());
-		memoryIntegers.add(new ArrayList<Integer>());
-		memoryIntegers.add(new ArrayList<Integer>());
-		memoryStrings.add(new ArrayList<String>());
-		memoryStrings.add(new ArrayList<String>());
-		memoryStrings.add(new ArrayList<String>());
-		SystemCalls systemCalls = new SystemCalls(memoryIntegers,memoryStrings);
-		
 		
 		Scheduler s = new Scheduler();
 		s.scheduling();	
@@ -105,21 +98,21 @@ public class Main {
 		Main.time = time;
 	}
 
-	public static ArrayList<ArrayList<Integer>> getMemoryIntegers() {
-		return memoryIntegers;
-	}
-
-	public static void setMemoryIntegers(ArrayList<ArrayList<Integer>> memoryIntegers) {
-		Main.memoryIntegers = memoryIntegers;
-	}
-
-	public static ArrayList<ArrayList<String>> getMemoryStrings() {
-		return memoryStrings;
-	}
-
-	public static void setMemoryStrings(ArrayList<ArrayList<String>> memoryStrings) {
-		Main.memoryStrings = memoryStrings;
-	}
+//	public static ArrayList<ArrayList<Integer>> getMemoryIntegers() {
+//		return memoryIntegers;
+//	}
+//
+//	public static void setMemoryIntegers(ArrayList<ArrayList<Integer>> memoryIntegers) {
+//		Main.memoryIntegers = memoryIntegers;
+//	}
+//
+//	public static ArrayList<ArrayList<String>> getMemoryStrings() {
+//		return memoryStrings;
+//	}
+//
+//	public static void setMemoryStrings(ArrayList<ArrayList<String>> memoryStrings) {
+//		Main.memoryStrings = memoryStrings;
+//	}
 
 	public static int getTimeSlice() {
 		return timeSlice;
@@ -191,6 +184,14 @@ public class Main {
 
 	public static void setTimeSliceNotOver(boolean timeSliceNotOver) {
 		Main.timeSliceNotOver = timeSliceNotOver;
+	}
+
+	public static QueueObj getAvailableProcessesQ() {
+		return availableProcessesQ;
+	}
+
+	public static void setAvailableProcessesQ(QueueObj availableProcessesQ) {
+		Main.availableProcessesQ = availableProcessesQ;
 	}
 
 
