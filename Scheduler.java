@@ -26,7 +26,7 @@ public class Scheduler {
 			Process p = Main.getReadyQ().dequeue();
 
 			p.setStatus(Status.RUNNING);
-			//System.out.println("Time: " + Main.getTime());
+			System.out.println("Time: " + Main.getTime());
 			System.out.println("Program" + " " + p.getProcessID() + " " + "is currently executing");
 			System.out.println("ready Queue:");
 			Main.getReadyQ().printQueue();
@@ -49,26 +49,9 @@ public class Scheduler {
 			else if (p.getStatus() != Status.BLOCKED) {
 				p.setStatus(Status.READY);
 				Main.getReadyQ().enqueue(p);
-//				if (Main.getReadyQ().isEmpty() == true)
-//					Main.getReadyQ().enqueue(p);
-//				else {
-//					for (int j = 0; j < Main.getReadyQ().size(); j++) {
-//						if (Main.getReadyQ().peek().getProcessID() == p.getProcessID()) {
-//							Main.getReadyQ().dequeue();
-//							break;
-//						} else
-//							Main.getReadyQ().enqueue(Main.getReadyQ().dequeue());
-//					}
-//					Main.getReadyQ().enqueue(p);
-//				}
+
 			}
-//			if (Main.getTime() == Main.getTime4Process1()) {
-//				Main.getIp().interpretation(Main.getP1id());
-//			} else if (Main.getTime() == Main.getTime4Process2()) {
-//				Main.getIp().interpretation(Main.getP2id());
-//			} else if (Main.getTime() == Main.getTime4Process3()) {
-//				Main.getIp().interpretation(Main.getP3id());
-//			}
+
 		}
 	}
 }

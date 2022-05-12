@@ -57,23 +57,13 @@ public class Interpreter {
 		}
 		default:
 			br = null;
-			System.out.println("Program "+PID+" not found.");
+			System.out.println("Program " + PID + " not found.");
 		}
-//		String currentLine = br.readLine();
-//		while (currentLine != null) {
-//			instructionsHere.add(currentLine);
-//			currentLine = br.readLine();
-//		}
 
 		// create new process that has PCB+program code(instructions).
 		Process p = new Process(PID, 0, Status.NEW, instructionsHere);
 		p.setStatus(Status.READY);
 		Main.getReadyQ().enqueue(p);
-		//System.out.println("Time: "+Main.getTime());
-		System.out.println("ready Queue:");
-		Main.getReadyQ().printQueue();
-		System.out.println("Blocked Queue:");
-		Main.getGeneralBlockedQ().printQueue();
 	}
 
 	public void convert(Process p) throws IOException {
@@ -92,38 +82,79 @@ public class Interpreter {
 				}
 				break;
 			} else {
-				System.out.println(p.getInstructions());
-				System.out.println("PC=" + p.getPc() + ". Instrustion" + " " + p.getInstructions().get(p.getPc())
-						+ " from program " + p.getProcessID() + " " + "is currently executing");
+
+				System.out.println(" Instrustion " + p.getInstructions().get(p.getPc()) + " is currently executing");
 				String[] content = p.getInstructions().get(p.getPc()).split(" ");
 				if (p.getInstructions().get(p.getPc()).contains("printFromTo"))
 					SystemCalls.printFromTo(content[1], content[2], p.getProcessID());
 				else if (p.getInstructions().get(p.getPc()).contains("print"))
 					SystemCalls.print(content[1], p.getProcessID());
 				else if (p.getInstructions().get(p.getPc()).contains("assign")) {
-					if (content[2].equals("readFile")) {
+					if (content[content.length - 2].equals("readFile")) {
+						Object y = SystemCalls.readFile(content[3]);
+						Main.setTime(Main.getTime() + 1);
+						if (Main.getTime() == Main.getTime4Process1()) {
+							Main.getIp().interpretation(Main.getP1id());
+						} else if (Main.getTime() == Main.getTime4Process2()) {
+							Main.getIp().interpretation(Main.getP2id());
+						} else if (Main.getTime() == Main.getTime4Process3()) {
+							Main.getIp().interpretation(Main.getP3id());
+						}
+						i++;
+						if (i == Main.getTimeSlice()) {
+							ArrayList<String> s = new ArrayList<>();
+							for (int j = 0; j < p.getInstructions().size(); j++) {
+								if (j!=p.getPc()) {
+									s.add(p.getInstructions().get(j));
+								} else {
+									s.add(p.getInstructions().get(j));
+									s.add("assign " + content[1] + " " + y);
+								}
+							}
+							p.setInstructions(s);
+						} else {
+							SystemCalls.assign(content[1], y, p.getProcessID());
+						}
+					} else if (content[content.length - 1].equals("input")) {
 						Scanner sc = new Scanner(System.in);
 						System.out.print("Please enter a value");
-						String input = sc.next();
-						try {
-							int y = Integer.parseInt(input);
-							SystemCalls.assign(content[1], y, p.getProcessID());
-							p.setPc((p.getPc()) + 1);
-							Main.setTime(Main.getTime() + 1);
-							break;
-						} catch (Exception e) {
-							String y = input;
-							SystemCalls.assign(content[1], y, p.getProcessID());
-							p.setPc((p.getPc()) + 1);
-							Main.setTime(Main.getTime() + 1);
-							break;
+						Object input = sc.next();
+						Main.setTime(Main.getTime() + 1);
+						if (Main.getTime() == Main.getTime4Process1()) {
+							Main.getIp().interpretation(Main.getP1id());
+						} else if (Main.getTime() == Main.getTime4Process2()) {
+							Main.getIp().interpretation(Main.getP2id());
+						} else if (Main.getTime() == Main.getTime4Process3()) {
+							Main.getIp().interpretation(Main.getP3id());
+						}
+						i++;
+						if (i == Main.getTimeSlice()) {
+							ArrayList<String> s = new ArrayList<>();
+							for (int j = 0; j < p.getInstructions().size(); j++) {
+								if (j!=p.getPc()) {
+									s.add(p.getInstructions().get(j));
+								} else {
+									s.add(p.getInstructions().get(j));
+									s.add("assign " + content[1] + " " + input);
+								}
+							}
+							p.setInstructions(s);
+						} else {
+							try {
+								int y = Integer.parseInt((String) input);
+								SystemCalls.assign(content[1], input, p.getProcessID());
+							} catch (Exception e) {
+								String y = (String) input;
+								SystemCalls.assign(content[1], y, p.getProcessID());
+							}
 						}
 					} else {
 						try {
-							SystemCalls.assign(content[1], Integer.parseInt(content[content.length - 1]),
-									p.getProcessID());
+							int y = Integer.parseInt((String) content[2]);
+							SystemCalls.assign(content[1], content[2], p.getProcessID());
 						} catch (Exception e) {
-							SystemCalls.assign(content[1], content[content.length - 1], p.getProcessID());
+							String y = (String) content[2];
+							SystemCalls.assign(content[1], y, p.getProcessID());
 						}
 					}
 				} else if (p.getInstructions().get(p.getPc()).contains("writeFile"))
@@ -150,7 +181,6 @@ public class Interpreter {
 
 				p.setPc((p.getPc()) + 1);
 				Main.setTime(Main.getTime() + 1);
-				System.out.println("Time: "+Main.getTime());
 				if (Main.getTime() == Main.getTime4Process1()) {
 					Main.getIp().interpretation(Main.getP1id());
 				} else if (Main.getTime() == Main.getTime4Process2()) {
@@ -161,6 +191,7 @@ public class Interpreter {
 			}
 		}
 	}
+
 	public Mutex getFile() {
 		return file;
 	}

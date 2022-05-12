@@ -37,7 +37,7 @@ public class SystemCalls {
 		}
 	}
 
-	public static void assign(String x, int y, int pid) {
+	public static void assign(String x, Object y, int pid) {
 		switch (pid) {
 		case 1:
 			table1.put(x, y);
@@ -51,19 +51,19 @@ public class SystemCalls {
 		}
 	}
 
-	public static void assign(String x, String y, int pid) {
-		switch (pid) {
-		case 1:
-			table1.put(x, y);
-			break;
-		case 2:
-			table2.put(x, y);
-			break;
-		case 3:
-			table3.put(x, y);
-			break;
-		}
-	}
+//	public static void assign(String x, String y, int pid) {
+//		switch (pid) {
+//		case 1:
+//			table1.put(x, y);
+//			break;
+//		case 2:
+//			table2.put(x, y);
+//			break;
+//		case 3:
+//			table3.put(x, y);
+//			break;
+//		}
+//	}
 
 	public static void writeFile(String x, String y) throws IOException {
 		// we assumed that String x will be the file path in the form of name.txt
@@ -76,13 +76,17 @@ public class SystemCalls {
 		
 	}
 
-	public static void readFile(String x) throws FileNotFoundException, IOException {
+	public static Object readFile(String x) throws FileNotFoundException, IOException {
 		BufferedReader br = new BufferedReader(new FileReader(x));
+		ArrayList<String> s=new ArrayList<>();
 		String currentLine = br.readLine();
 		while (currentLine != null) {
-			System.out.println(currentLine);
+			s.add(currentLine);
+			//System.out.println(currentLine);
 			currentLine = br.readLine();
 		}
+		//System.out.println(s);
+		return s;
 	}
 
 	public static void printFromTo(String x, String y, int pid) {
@@ -90,18 +94,18 @@ public class SystemCalls {
 		int y1 = 0;
 		switch (pid) {
 		case 1: {
-			x1 = (int) table1.get(x);
-			y1 = (int) table1.get(y);
+			x1 = Integer.parseInt((String) table1.get(x));
+			y1 = Integer.parseInt((String) table1.get(y));
 		}
 			break;
 		case 2: {
-			x1 = (int) table2.get(x);
-			y1 = (int) table2.get(y);
+			x1 = Integer.parseInt((String) table2.get(x));
+			y1 = Integer.parseInt((String) table2.get(y));
 		}
 			break;
 		case 3: {
-			x1 = (int) table3.get(x);
-			y1 = (int) table3.get(y);
+			x1 = Integer.parseInt((String) table3.get(x));
+			y1 = Integer.parseInt((String) table3.get(y));
 		}
 			break;
 		}
