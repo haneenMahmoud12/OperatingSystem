@@ -28,31 +28,48 @@ public class Interpreter {
 		case 1: {
 			br = new BufferedReader(new FileReader(
 					"C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_1.txt"));
+			String currentLine = br.readLine();
+			while (currentLine != null) {
+				instructionsHere.add(currentLine);
+				currentLine = br.readLine();
+			}
 			break;
 		}
 		case 2: {
 			br = new BufferedReader(new FileReader(
 					"C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_2.txt"));
+			String currentLine = br.readLine();
+			while (currentLine != null) {
+				instructionsHere.add(currentLine);
+				currentLine = br.readLine();
+			}
 			break;
 		}
 		case 3: {
 			br = new BufferedReader(new FileReader(
 					"C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_3.txt"));
+			String currentLine = br.readLine();
+			while (currentLine != null) {
+				instructionsHere.add(currentLine);
+				currentLine = br.readLine();
+			}
 			break;
 		}
 		default:
 			br = null;
+			System.out.println("Program "+PID+" not found.");
 		}
-		String currentLine = br.readLine();
-		while (currentLine != null) {
-			instructionsHere.add(currentLine);
-			currentLine = br.readLine();
-		}
+//		String currentLine = br.readLine();
+//		while (currentLine != null) {
+//			instructionsHere.add(currentLine);
+//			currentLine = br.readLine();
+//		}
 
 		// create new process that has PCB+program code(instructions).
 		Process p = new Process(PID, 0, Status.NEW, instructionsHere);
 		p.setStatus(Status.READY);
 		Main.getReadyQ().enqueue(p);
+		//System.out.println("Time: "+Main.getTime());
 		System.out.println("ready Queue:");
 		Main.getReadyQ().printQueue();
 		System.out.println("Blocked Queue:");
@@ -64,10 +81,6 @@ public class Interpreter {
 		for (int i = 0; i < Main.getTimeSlice(); i++) {
 
 			if (p.getPc() >= p.getInstructions().size()) {
-//				Main.setTime(Main.getTime() + 1);
-//				if (i < Main.getTimeSlice()) {
-//					Main.setTimeSliceNotOver(true);
-//				}
 				break;
 			} else if (p.getStatus() == Status.BLOCKED) {
 				for (int j = 0; j < Main.getReadyQ().size(); j++) {
@@ -83,7 +96,9 @@ public class Interpreter {
 				System.out.println("PC=" + p.getPc() + ". Instrustion" + " " + p.getInstructions().get(p.getPc())
 						+ " from program " + p.getProcessID() + " " + "is currently executing");
 				String[] content = p.getInstructions().get(p.getPc()).split(" ");
-				if (p.getInstructions().get(p.getPc()).contains("print"))
+				if (p.getInstructions().get(p.getPc()).contains("printFromTo"))
+					SystemCalls.printFromTo(content[1], content[2], p.getProcessID());
+				else if (p.getInstructions().get(p.getPc()).contains("print"))
 					SystemCalls.print(content[1], p.getProcessID());
 				else if (p.getInstructions().get(p.getPc()).contains("assign")) {
 					if (content[2].equals("readFile")) {
@@ -115,8 +130,6 @@ public class Interpreter {
 					SystemCalls.writeFile(content[1], content[2]);
 				else if (p.getInstructions().get(p.getPc()).contains("readFile"))
 					SystemCalls.readFile(content[1]);
-				else if (p.getInstructions().get(p.getPc()).contains("printFromTo"))
-					SystemCalls.printFromTo(content[1], content[2], p.getProcessID());
 				else if (p.getInstructions().get(p.getPc()).contains("semWait")) {
 					if (content[1].equals("file")) {
 						file.semWait("file", p);
@@ -137,6 +150,7 @@ public class Interpreter {
 
 				p.setPc((p.getPc()) + 1);
 				Main.setTime(Main.getTime() + 1);
+				System.out.println("Time: "+Main.getTime());
 				if (Main.getTime() == Main.getTime4Process1()) {
 					Main.getIp().interpretation(Main.getP1id());
 				} else if (Main.getTime() == Main.getTime4Process2()) {
