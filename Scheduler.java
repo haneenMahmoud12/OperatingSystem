@@ -26,7 +26,7 @@ public class Scheduler {
 			Process p = Main.getReadyQ().dequeue();
 
 			p.setStatus(Status.RUNNING);
-			System.out.println("Time: " + Main.getTime());
+			//System.out.println("Time: " + Main.getTime());
 			System.out.println("Program" + " " + p.getProcessID() + " " + "is currently executing");
 			System.out.println("ready Queue:");
 			Main.getReadyQ().printQueue();
@@ -38,7 +38,6 @@ public class Scheduler {
 			if (p.getPc() >= p.getInstructions().size()) {
 				p.setStatus(Status.FINISHED);
 				Main.getFinishedProcessesQ().enqueue(p);
-				//System.out.println("Time: " + Main.getTime());
 				System.out.println("Program  " + p.getProcessID() + " has finished execution.");
 				System.out.println("ready Queue");
 				Main.getReadyQ().printQueue();

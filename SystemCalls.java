@@ -1,6 +1,7 @@
 package programs;
 
 import java.io.BufferedReader;
+import programs.VarVal;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,9 +14,13 @@ import java.util.*;
 
 public class SystemCalls {
 	// Memory
-	private static Hashtable<String, Object> table1 = new Hashtable<String, Object>();
-	private static Hashtable<String, Object> table2 = new Hashtable<String, Object>();
-	private static Hashtable<String, Object> table3 = new Hashtable<String, Object>();
+	private static Hashtable<String, Object> table1 = new Hashtable<String, Object>(); // p1 16 words
+	private static Hashtable<String, Object> table2 = new Hashtable<String, Object>(); // p2 15 words
+	private static Hashtable<String, Object> table3 = new Hashtable<String, Object>(); // p3 17 words
+
+	private static Object[] memory = new Object[40];
+	private static int memoryPointer = 0;
+	private static ArrayList<Object> disk = new ArrayList<Object>();
 
 	public SystemCalls() {
 	}
@@ -37,55 +42,66 @@ public class SystemCalls {
 		}
 	}
 
-	public static void assign(String x, Object y, int pid) {
-		switch (pid) {
-		case 1:
-			table1.put(x, y);
-			break;
-		case 2:
-			table2.put(x, y);
-			break;
-		case 3:
-			table3.put(x, y);
-			break;
-		}
+	public static void assign(String x, Object y, Process p) {
+		VarVal newObj = new VarVal(x, y);
+		if (memory[p.getMemoryUpperBound() - 2].equals(0))
+			memory[p.getMemoryUpperBound() - 2] = newObj;
+		else if (memory[p.getMemoryUpperBound() - 1].equals(0))
+			memory[p.getMemoryUpperBound() - 1] = newObj;
+		else if (memory[p.getMemoryUpperBound()].equals(0))
+			memory[p.getMemoryUpperBound()] = newObj;
+		else
+			System.out.print("Not enough space in memory!");
 	}
 
-//	public static void assign(String x, String y, int pid) {
-//		switch (pid) {
-//		case 1:
-//			table1.put(x, y);
-//			break;
-//		case 2:
-//			table2.put(x, y);
-//			break;
-//		case 3:
-//			table3.put(x, y);
-//			break;
-//		}
-//	}
+	public static void writeFile(String x, String y, Process p) throws IOException {
+		boolean exist = true;
+		VarVal Objx = new VarVal("", "");
+		VarVal Objy = new VarVal("", "");
+		File newFile;
+		BufferedWriter writer;
+		// finding x
+		if (!memory[p.getMemoryUpperBound() - 2].equals(0))
+			Objx = (VarVal) memory[p.getMemoryUpperBound() - 2];
+		else if (!memory[p.getMemoryUpperBound() - 1].equals(0))
+			Objx = (VarVal) memory[p.getMemoryUpperBound() - 1];
+		else if (!memory[p.getMemoryUpperBound()].equals(0))
+			Objx = (VarVal) memory[p.getMemoryUpperBound()];
+		else {
+			System.out.print("Variable " + x + " not found in memory!");
+			exist = false;
+		}
 
-	public static void writeFile(String x, String y) throws IOException {
-		// we assumed that String x will be the file path in the form of name.txt
-		File newFile = new File(x);
-		newFile.createNewFile();
-		BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
-		writer.write(y);
-		writer.close();
-		
-		
+		// finding y
+		if (exist == true) {
+			if (!memory[p.getMemoryUpperBound() - 2].equals(0))
+				Objy = (VarVal) memory[p.getMemoryUpperBound() - 2];
+			else if (!memory[p.getMemoryUpperBound() - 1].equals(0))
+				Objy = (VarVal) memory[p.getMemoryUpperBound() - 1];
+			else if (!memory[p.getMemoryUpperBound()].equals(0))
+				Objy = (VarVal) memory[p.getMemoryUpperBound()];
+			else
+				System.out.print("Variable " + y + " not found in memory!");
+		}
+		if (Objx.getVar() == x && Objy.getVar() == y) {
+			newFile = new File((String) Objx.getVal());
+			newFile.createNewFile();
+			writer = new BufferedWriter(new FileWriter(newFile));
+			writer.write((int) Objy.getVal());
+			writer.close();
+		}
 	}
 
 	public static Object readFile(String x) throws FileNotFoundException, IOException {
 		BufferedReader br = new BufferedReader(new FileReader(x));
-		ArrayList<String> s=new ArrayList<>();
+		ArrayList<String> s = new ArrayList<>();
 		String currentLine = br.readLine();
 		while (currentLine != null) {
 			s.add(currentLine);
-			//System.out.println(currentLine);
+			// System.out.println(currentLine);
 			currentLine = br.readLine();
 		}
-		//System.out.println(s);
+		// System.out.println(s);
 		return s;
 	}
 
@@ -114,13 +130,29 @@ public class SystemCalls {
 			System.out.println(i + " ");
 		}
 	}
-//	public void readFromMemory(int processID) {
-//	for(int i=0;i<memoryIntegers.get(processID).size();i++) {
-//		System.out.println(memoryIntegers.get(processID).get(i));
-//	}
-//	for(int i=0;i<memoryStrings.size();i++) {
-//		System.out.println(memoryStrings.get(processID).get(i));
-//	}
-//}
+
+	public static Object[] getMemory() {
+		return memory;
+	}
+
+	public static void setMemory(Object[] memory) {
+		SystemCalls.memory = memory;
+	}
+
+	public static ArrayList<Object> getDisk() {
+		return disk;
+	}
+
+	public static void setDisk(ArrayList<Object> disk) {
+		SystemCalls.disk = disk;
+	}
+
+	public static int getMemoryPointer() {
+		return memoryPointer;
+	}
+
+	public static void setMemoryPointer(int memoryPointer) {
+		SystemCalls.memoryPointer = memoryPointer;
+	}
 
 }

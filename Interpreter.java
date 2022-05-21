@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import programs.ProgramFile;
 
 public class Interpreter {
 	public Mutex file;
@@ -27,7 +28,7 @@ public class Interpreter {
 		switch (PID) {
 		case 1: {
 			br = new BufferedReader(new FileReader(
-					"C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_1.txt"));
+					"C:\\Users\\hanee\\OneDrive\\Desktop\\Team_37\\src\\programs\\Program_1.txt"));
 			String currentLine = br.readLine();
 			while (currentLine != null) {
 				instructionsHere.add(currentLine);
@@ -37,7 +38,7 @@ public class Interpreter {
 		}
 		case 2: {
 			br = new BufferedReader(new FileReader(
-					"C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_2.txt"));
+					"C:\\Users\\hanee\\OneDrive\\Desktop\\Team_37\\src\\programs\\Program_2.txt"));
 			String currentLine = br.readLine();
 			while (currentLine != null) {
 				instructionsHere.add(currentLine);
@@ -47,7 +48,7 @@ public class Interpreter {
 		}
 		case 3: {
 			br = new BufferedReader(new FileReader(
-					"C:\\Lucy\\Semester 6\\Operating Systems (CSEN 602)\\OSProject\\Team_37\\src\\programs\\Program_3.txt"));
+					"C:\\Users\\hanee\\OneDrive\\Desktop\\Team_37\\src\\programs\\Program_3.txt"));
 			String currentLine = br.readLine();
 			while (currentLine != null) {
 				instructionsHere.add(currentLine);
@@ -61,9 +62,34 @@ public class Interpreter {
 		}
 
 		// create new process that has PCB+program code(instructions).
-		Process p = new Process(PID, 0, Status.NEW, instructionsHere);
-		p.setStatus(Status.READY);
-		Main.getReadyQ().enqueue(p);
+		int size = 5+instructionsHere.size()+3;
+		if(size<(SystemCalls.getMemory().length-(SystemCalls.getMemoryPointer()+1))) {
+			int LowerBound = SystemCalls.getMemoryPointer()+1;
+			int UpperBound = SystemCalls.getMemoryPointer()+size;
+			Process p = new Process(PID, 0, Status.NEW, instructionsHere,LowerBound,UpperBound);
+			p.setStatus(Status.READY);
+			Main.getReadyQ().enqueue(p);
+			SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = p.getProcessID();
+			SystemCalls.setMemoryPointer(SystemCalls.getMemoryPointer()+1);
+			SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = p.getPc();
+			SystemCalls.setMemoryPointer(SystemCalls.getMemoryPointer()+1);
+			SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = p.getStatus();
+			SystemCalls.setMemoryPointer(SystemCalls.getMemoryPointer()+1);
+
+			for(int i =SystemCalls.getMemoryPointer()+1;i<SystemCalls.getMemoryPointer()+1+instructionsHere.size();i++) {
+				SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = instructionsHere.get(i);
+				SystemCalls.setMemoryPointer(SystemCalls.getMemoryPointer()+1);
+			}
+			SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = p.getMemoryLowerBound();
+			SystemCalls.setMemoryPointer(SystemCalls.getMemoryPointer()+1);
+			SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = p.getMemoryUpperBound();
+			SystemCalls.setMemoryPointer(p.getMemoryUpperBound());
+			
+		}
+		else {
+			
+		}
+		
 	}
 
 	public void convert(Process p) throws IOException {
@@ -113,7 +139,7 @@ public class Interpreter {
 							}
 							p.setInstructions(s);
 						} else {
-							SystemCalls.assign(content[1], y, p.getProcessID());
+							SystemCalls.assign(content[1], y, p);
 						}
 					} else if (content[content.length - 1].equals("input")) {
 						Scanner sc = new Scanner(System.in);
@@ -142,23 +168,23 @@ public class Interpreter {
 						} else {
 							try {
 								int y = Integer.parseInt((String) input);
-								SystemCalls.assign(content[1], input, p.getProcessID());
+								SystemCalls.assign(content[1], input, p);
 							} catch (Exception e) {
 								String y = (String) input;
-								SystemCalls.assign(content[1], y, p.getProcessID());
+								SystemCalls.assign(content[1], y, p);
 							}
 						}
 					} else {
 						try {
 							int y = Integer.parseInt((String) content[2]);
-							SystemCalls.assign(content[1], content[2], p.getProcessID());
+							SystemCalls.assign(content[1], content[2], p);
 						} catch (Exception e) {
 							String y = (String) content[2];
-							SystemCalls.assign(content[1], y, p.getProcessID());
+							SystemCalls.assign(content[1], y, p);
 						}
 					}
 				} else if (p.getInstructions().get(p.getPc()).contains("writeFile"))
-					SystemCalls.writeFile(content[1], content[2]);
+					SystemCalls.writeFile(content[1], content[2],p);
 				else if (p.getInstructions().get(p.getPc()).contains("readFile"))
 					SystemCalls.readFile(content[1]);
 				else if (p.getInstructions().get(p.getPc()).contains("semWait")) {

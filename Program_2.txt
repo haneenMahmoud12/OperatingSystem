@@ -3,5 +3,5 @@ assign a input
 assign b input
 semSignal userInput
 semWait file
-writeFile a.txt b
+writeFile a b
 semSignal file
