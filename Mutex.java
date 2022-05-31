@@ -31,12 +31,15 @@ public class Mutex {
 //	depending on the value of the flag.
 
 	public void semWait(String Flag, Process p) {
+		int statusLocation;
 		if (Flag.equals("file")) {
 			if (this.file == true) {
 				this.file = false;
 				pid_file = p.getProcessID();
 			} else {
 				p.setStatus(Status.BLOCKED);
+				statusLocation = p.getMemoryLowerBound()+2;
+				Main.getMemory()[statusLocation] = p.getStatus();
 				this.fileBlockedQ.enqueue(p);
 				Main.getGeneralBlockedQ().enqueue(p);
 				System.out.println("ready Queue");
@@ -52,6 +55,8 @@ public class Mutex {
 				pid_input = p.getProcessID();
 			} else {
 				p.setStatus(Status.BLOCKED);
+				statusLocation = p.getMemoryLowerBound()+2;
+				Main.getMemory()[statusLocation] = p.getStatus();
 				this.userInputBlockedQ.enqueue(p);
 				Main.getGeneralBlockedQ().enqueue(p);
 				System.out.println("ready Queue");
@@ -67,6 +72,8 @@ public class Mutex {
 				pid_output = p.getProcessID();
 			} else {
 				p.setStatus(Status.BLOCKED);
+				statusLocation = p.getMemoryLowerBound()+2;
+				Main.getMemory()[statusLocation] = p.getStatus();
 				this.userOutputBlockedQ.enqueue(p);
 				Main.getGeneralBlockedQ().enqueue(p);
 				System.out.println("ready Queue");
@@ -81,6 +88,7 @@ public class Mutex {
 	}
 
 	public void semSignal(String Flag, Process p) {
+		int statusLocation;
 		if (Flag.equals("file")) {
 			if (p.getProcessID() == pid_file) {
 				if (fileBlockedQ.isEmpty())
@@ -95,6 +103,8 @@ public class Mutex {
 							break;	
 					}
 					p1.setStatus(Status.READY);
+					statusLocation = p.getMemoryLowerBound()+2;
+					Main.getMemory()[statusLocation] = p.getStatus();
 					if(Main.getReadyQ().peek().getProcessID()!=p1.getProcessID())
 						Main.getReadyQ().enqueue(p1);
 					pid_file = p1.getProcessID();
@@ -114,6 +124,8 @@ public class Mutex {
 							break;	
 					}
 					p1.setStatus(Status.READY);
+					statusLocation = p.getMemoryLowerBound()+2;
+					Main.getMemory()[statusLocation] = p.getStatus();
 					if(Main.getReadyQ().peek().getProcessID()!=p1.getProcessID())
 						Main.getReadyQ().enqueue(p1);
 					pid_input = p1.getProcessID();
@@ -135,6 +147,8 @@ public class Mutex {
 							break;	
 					}
 					p1.setStatus(Status.READY);
+					statusLocation = p.getMemoryLowerBound()+2;
+					Main.getMemory()[statusLocation] = p.getStatus();
 					if(Main.getReadyQ().peek().getProcessID()!=p1.getProcessID())
 						Main.getReadyQ().enqueue(p1);
 					pid_output = p1.getProcessID();

@@ -27,8 +27,8 @@ public class Interpreter {
 		BufferedReader br;
 		switch (PID) {
 		case 1: {
-			br = new BufferedReader(new FileReader(
-					"C:\\Users\\hanee\\OneDrive\\Desktop\\Team_37\\src\\programs\\Program_1.txt"));
+			br = new BufferedReader(
+					new FileReader("C:\\Users\\hanee\\OneDrive\\Desktop\\Team_37\\src\\programs\\Program_1.txt"));
 			String currentLine = br.readLine();
 			while (currentLine != null) {
 				instructionsHere.add(currentLine);
@@ -37,8 +37,8 @@ public class Interpreter {
 			break;
 		}
 		case 2: {
-			br = new BufferedReader(new FileReader(
-					"C:\\Users\\hanee\\OneDrive\\Desktop\\Team_37\\src\\programs\\Program_2.txt"));
+			br = new BufferedReader(
+					new FileReader("C:\\Users\\hanee\\OneDrive\\Desktop\\Team_37\\src\\programs\\Program_2.txt"));
 			String currentLine = br.readLine();
 			while (currentLine != null) {
 				instructionsHere.add(currentLine);
@@ -47,8 +47,8 @@ public class Interpreter {
 			break;
 		}
 		case 3: {
-			br = new BufferedReader(new FileReader(
-					"C:\\Users\\hanee\\OneDrive\\Desktop\\Team_37\\src\\programs\\Program_3.txt"));
+			br = new BufferedReader(
+					new FileReader("C:\\Users\\hanee\\OneDrive\\Desktop\\Team_37\\src\\programs\\Program_3.txt"));
 			String currentLine = br.readLine();
 			while (currentLine != null) {
 				instructionsHere.add(currentLine);
@@ -60,36 +60,7 @@ public class Interpreter {
 			br = null;
 			System.out.println("Program " + PID + " not found.");
 		}
-
-		// create new process that has PCB+program code(instructions).
-		int size = 5+instructionsHere.size()+3;
-		if(size<(SystemCalls.getMemory().length-(SystemCalls.getMemoryPointer()+1))) {
-			int LowerBound = SystemCalls.getMemoryPointer()+1;
-			int UpperBound = SystemCalls.getMemoryPointer()+size;
-			Process p = new Process(PID, 0, Status.NEW, instructionsHere,LowerBound,UpperBound);
-			p.setStatus(Status.READY);
-			Main.getReadyQ().enqueue(p);
-			SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = p.getProcessID();
-			SystemCalls.setMemoryPointer(SystemCalls.getMemoryPointer()+1);
-			SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = p.getPc();
-			SystemCalls.setMemoryPointer(SystemCalls.getMemoryPointer()+1);
-			SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = p.getStatus();
-			SystemCalls.setMemoryPointer(SystemCalls.getMemoryPointer()+1);
-
-			for(int i =SystemCalls.getMemoryPointer()+1;i<SystemCalls.getMemoryPointer()+1+instructionsHere.size();i++) {
-				SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = instructionsHere.get(i);
-				SystemCalls.setMemoryPointer(SystemCalls.getMemoryPointer()+1);
-			}
-			SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = p.getMemoryLowerBound();
-			SystemCalls.setMemoryPointer(SystemCalls.getMemoryPointer()+1);
-			SystemCalls.getMemory()[SystemCalls.getMemoryPointer()+1] = p.getMemoryUpperBound();
-			SystemCalls.setMemoryPointer(p.getMemoryUpperBound());
-			
-		}
-		else {
-			
-		}
-		
+		Main.processCreation(instructionsHere, PID);
 	}
 
 	public void convert(Process p) throws IOException {
@@ -112,9 +83,9 @@ public class Interpreter {
 				System.out.println(" Instrustion " + p.getInstructions().get(p.getPc()) + " is currently executing");
 				String[] content = p.getInstructions().get(p.getPc()).split(" ");
 				if (p.getInstructions().get(p.getPc()).contains("printFromTo"))
-					SystemCalls.printFromTo(content[1], content[2], p.getProcessID());
+					SystemCalls.printFromTo(content[1], content[2], p);
 				else if (p.getInstructions().get(p.getPc()).contains("print"))
-					SystemCalls.print(content[1], p.getProcessID());
+					SystemCalls.print(content[1], p);
 				else if (p.getInstructions().get(p.getPc()).contains("assign")) {
 					if (content[content.length - 2].equals("readFile")) {
 						Object y = SystemCalls.readFile(content[3]);
@@ -130,7 +101,7 @@ public class Interpreter {
 						if (i == Main.getTimeSlice()) {
 							ArrayList<String> s = new ArrayList<>();
 							for (int j = 0; j < p.getInstructions().size(); j++) {
-								if (j!=p.getPc()) {
+								if (j != p.getPc()) {
 									s.add(p.getInstructions().get(j));
 								} else {
 									s.add(p.getInstructions().get(j));
@@ -157,7 +128,7 @@ public class Interpreter {
 						if (i == Main.getTimeSlice()) {
 							ArrayList<String> s = new ArrayList<>();
 							for (int j = 0; j < p.getInstructions().size(); j++) {
-								if (j!=p.getPc()) {
+								if (j != p.getPc()) {
 									s.add(p.getInstructions().get(j));
 								} else {
 									s.add(p.getInstructions().get(j));
@@ -184,7 +155,7 @@ public class Interpreter {
 						}
 					}
 				} else if (p.getInstructions().get(p.getPc()).contains("writeFile"))
-					SystemCalls.writeFile(content[1], content[2],p);
+					SystemCalls.writeFile(content[1], content[2], p);
 				else if (p.getInstructions().get(p.getPc()).contains("readFile"))
 					SystemCalls.readFile(content[1]);
 				else if (p.getInstructions().get(p.getPc()).contains("semWait")) {
@@ -206,7 +177,17 @@ public class Interpreter {
 				}
 
 				p.setPc((p.getPc()) + 1);
+				int pcLocation=p.getMemoryLowerBound()+1;
+				Main.getMemory()[pcLocation]=p.getPc();
 				Main.setTime(Main.getTime() + 1);
+				System.out.println("Time: "+Main.getTime());
+				System.out.println("Memory:");
+				for(int z=0;z<Main.getMemory().length;z++) {
+//					if(Main.getMemory()[z]==null)
+//						break;
+					System.out.println(Main.getMemory()[z]);
+				}
+				
 				if (Main.getTime() == Main.getTime4Process1()) {
 					Main.getIp().interpretation(Main.getP1id());
 				} else if (Main.getTime() == Main.getTime4Process2()) {
